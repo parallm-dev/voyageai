@@ -1,4 +1,3 @@
-use crate::client::VoyageAiClient;
 use crate::errors::VoyageBuilderError;
 use crate::models::RerankModel;
 use serde::Serialize;

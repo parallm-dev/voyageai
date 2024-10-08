@@ -102,7 +102,7 @@ pub trait Rerank {
 #[async_trait]
 impl Rerank for RerankClient {
     async fn rerank(&self, request: RerankRequest) -> Result<RerankResponse, VoyageError> {
-        self.rerank(request).await
+        self.rerank(&request).await
     }
 }
 

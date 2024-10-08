@@ -151,16 +151,16 @@ pub async fn llm(
 ) -> Result<GenerateResponse, VoyageError> {
     // Implement the API call to generate response
     // Placeholder implementation
-    let embeddings_request = client
-        .embeddings()
-        .create_embedding(vec![prompt.to_string()])
-        .model(options.model)
-        .build()
-        .map_err(|e| VoyageError::InvalidRequest {
-            message: e.to_string(),
-        })?;
+    let embeddings_result = crate::models::embeddings::EmbeddingsResult {
+        data: vec![prompt.to_string()],
+        model: options.model,
+        usage: crate::models::Usage { total_tokens: 0 },
+    };
 
-    let response = embeddings_request.send().await?;
+    let response = client
+        .embeddings()
+        .create_embedding(&embeddings_result)
+        .await?;
     // Process the response as needed
     Ok(GenerateResponse {
         text: format!("Generated response for prompt: {}", prompt),
