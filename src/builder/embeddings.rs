@@ -1,4 +1,8 @@
 use serde::{Deserialize, Serialize};
+use crate::errors::VoyageBuilderError as EmbeddingsBuilderError;
+use crate::models::EmbeddingModel;
+use crate::VoyageAiClient;
+use crate::VoyageError;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Object {
@@ -35,9 +39,6 @@ pub struct EmbeddingData {
 pub struct Usage {
     pub total_tokens: u32,
 }
-use crate::errors::VoyageBuilderError as EmbeddingsBuilderError;
-use crate::models::EmbeddingModel;
-use crate::VoyageAiClient;
 
 #[derive(Debug, Default)]
 pub struct EmbeddingsRequestBuilder {
@@ -96,12 +97,13 @@ impl EmbeddingsRequestBuilder {
         }
 
         Ok(EmbeddingsRequest {
-            input,
+            input: match input {
+                EmbeddingsInput::Single(s) => vec![s],
+                EmbeddingsInput::Multiple(v) => v,
+            },
             model,
-            input_type: self.input_type,
-            voyage,
-            truncation: self.truncation,
             encoding_format: self.encoding_format,
+            user: None,
         })
     }
 }
@@ -118,8 +120,6 @@ pub enum EmbeddingsInput {
     Multiple(Vec<String>),
 }
 
-use serde::Serialize;
-
 #[derive(Debug, Serialize)]
 pub struct EmbeddingsRequest {
     pub input: Vec<String>,
@@ -130,10 +130,8 @@ pub struct EmbeddingsRequest {
     pub user: Option<String>,
 }
 
-use crate::VoyageError;
-
 impl EmbeddingsRequest {
-    pub async fn send(self) -> Result<EmbeddingsResponse, VoyageError> {
-        self.voyage.embeddings().create_embedding(&EmbeddingsRequest::from(self)).await
+    pub async fn send(self, client: &VoyageAiClient) -> Result<EmbeddingsResponse, VoyageError> {
+        client.embeddings().create_embedding(&self).await
     }
 }

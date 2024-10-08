@@ -152,7 +152,7 @@ pub async fn llm(
 ) -> Result<GenerateResponse, VoyageError> {
     // Implement the API call to generate response
     // Placeholder implementation
-    let embedding_data = crate::client::embeddings_client::EmbeddingData {
+    let _embedding_data = crate::client::embeddings_client::EmbeddingData {
         object: String::from("embedding"),
         embedding: vec![0.0; options.model.embedding_dimension()],
         index: 0,
