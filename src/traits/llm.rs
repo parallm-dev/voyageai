@@ -166,7 +166,7 @@ pub async fn llm(
 
     let _response = client
         .embeddings()
-        .create_embedding(&EmbeddingsRequest::from(&embeddings_result))
+        .create_embedding(&EmbeddingsRequest::from(embeddings_result))
         .await?;
     // Process the response as needed
     Ok(GenerateResponse {
