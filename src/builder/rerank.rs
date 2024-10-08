@@ -11,15 +11,11 @@ pub struct RerankRequestBuilder {
     top_n: Option<usize>,
     truncate: Option<bool>,
     include_metadata: Option<bool>,
-    voyage: Option<VoyageAiClient>,
 }
 
 impl RerankRequestBuilder {
-    pub fn new(voyage: VoyageAiClient) -> Self {
-        Self {
-            voyage: Some(voyage),
-            ..Default::default()
-        }
+    pub fn new() -> Self {
+        Default::default()
     }
 
     pub fn query(mut self, query: impl Into<String>) -> Self {
@@ -60,7 +56,6 @@ impl RerankRequestBuilder {
             .documents
             .ok_or(VoyageBuilderError::MissingField("documents".to_string()))?;
         let model = self.model.ok_or(VoyageBuilderError::MissingModel)?;
-        let voyage = self.voyage.ok_or(VoyageBuilderError::MissingVoyage)?;
 
         Ok(RerankRequest {
             query,
@@ -69,7 +64,6 @@ impl RerankRequestBuilder {
             top_n: self.top_n,
             truncate: self.truncate.unwrap_or(false),
             include_metadata: self.include_metadata.unwrap_or(false),
-            voyage,
         })
     }
 }
@@ -83,21 +77,11 @@ pub struct RerankRequest {
     pub top_n: Option<usize>,
     pub truncate: bool,
     pub include_metadata: bool,
-    #[serde(skip)]
-    pub voyage: VoyageAiClient,
 }
 
 impl RerankRequest {
     pub fn share(&self) -> RerankRequest {
-        RerankRequest {
-            query: self.query.clone(),
-            documents: self.documents.clone(),
-            model: self.model,
-            top_n: self.top_n,
-            truncate: self.truncate,
-            include_metadata: self.include_metadata,
-            voyage: self.voyage.clone(),
-        }
+        self.clone()
     }
 
     pub fn request(&self) -> &RerankRequest {
