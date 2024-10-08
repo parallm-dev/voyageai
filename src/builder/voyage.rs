@@ -1,5 +1,4 @@
 use crate::client::client_limiter::RateLimiter;
-use crate::client::rerank_client::RerankClient;
 use crate::config::VoyageConfig;
 use crate::errors::VoyageBuilderError;
 use crate::EmbeddingsRequestBuilder;
@@ -9,6 +8,8 @@ use crate::RerankRequestBuilder;
 pub struct VoyageAiClient {
     pub(crate) api_key: String,
     pub(crate) client: reqwest::Client,
+    pub(crate) embeddings_client: crate::client::embeddings_client::EmbeddingClient,
+    pub(crate) rerank_client: crate::client::rerank_client::RerankClient,
     pub(crate) rate_limiter: RateLimiter,
 }
 
@@ -17,7 +18,7 @@ impl VoyageAiClient {
         VoyageBuilder::new()
     }
 
-    pub fn embeddings(&self) -> &crate::client::embeddings_client::EmbeddingsClient {
+    pub fn embeddings(&self) -> &crate::client::embeddings_client::EmbeddingClient {
         &self.embeddings_client
     }
 
@@ -97,7 +98,7 @@ pub fn rerank() -> crate::client::rerank_client::RerankClientBuilder {
 }
 
 pub fn rerank_request_builder() -> RerankRequestBuilder {
-    let client = crate::client::voyage_client::VoyageAiClient::builder().build().unwrap();
+    let client = VoyageAiClient::builder().build().unwrap();
     RerankRequestBuilder::new(client)
 }
 
