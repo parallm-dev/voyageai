@@ -38,7 +38,7 @@ mod tests {
             .build()
             .expect("Failed to build embeddings request");
 
-        let response = embeddings_request.send().await;
+        let response = embeddings_request.send(&client).await;
         assert!(response.is_err());
     }
 

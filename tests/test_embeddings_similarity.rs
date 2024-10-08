@@ -20,7 +20,7 @@ async fn test_embeddings_similarity() {
     let dissimilar_query = "The economic impact of climate change on agriculture";
 
     // Generate embeddings for the document and queries
-    let generate_embedding = |text: &str| async {
+    let generate_embedding = |text: String| async move {
         let request = client
             .embeddings()
             .input(text)
@@ -28,16 +28,16 @@ async fn test_embeddings_similarity() {
             .build()
             .expect("Failed to build embeddings request");
 
-        client.embeddings().create_embedding(&request).await
+        request.send(&client).await
             .expect("Failed to create embedding")
             .data[0]
             .embedding
             .clone()
     };
 
-    let document_embedding = generate_embedding(obscure_document).await;
-    let similar_query_embedding = generate_embedding(similar_query).await;
-    let dissimilar_query_embedding = generate_embedding(dissimilar_query).await;
+    let document_embedding = generate_embedding(obscure_document.to_string()).await;
+    let similar_query_embedding = generate_embedding(similar_query.to_string()).await;
+    let dissimilar_query_embedding = generate_embedding(dissimilar_query.to_string()).await;
 
     // Calculate similarities
     let similarity_to_similar = cosine_similarity(&document_embedding, &similar_query_embedding);
