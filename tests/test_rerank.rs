@@ -9,7 +9,7 @@ async fn test_rerank() {
 
     let rerank_request = crate::builder::RerankRequestBuilder::new()
         .query("test query")
-        .documents(vec!["doc1".to_string(), "doc2".to_string(), "doc3".to_string()])
+        .documents(["doc1", "doc2", "doc3"])
         .model(RerankModel::V2)
         .build()
         .expect("Failed to build rerank request");
