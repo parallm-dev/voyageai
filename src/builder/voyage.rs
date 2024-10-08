@@ -92,7 +92,8 @@ pub fn rerank() -> crate::client::rerank_client::RerankClientBuilder {
 }
 
 pub fn rerank_request_builder() -> RerankRequestBuilder<'static> {
-    RerankRequestBuilder::new(&crate::client::voyage_client::VoyageAiClient::builder().build().unwrap())
+    let client = crate::client::voyage_client::VoyageAiClient::builder().build().unwrap();
+    RerankRequestBuilder::new(&client)
 }
 
 pub use crate::builder::embeddings::EmbeddingsRequest;

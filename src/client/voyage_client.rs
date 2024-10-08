@@ -1,5 +1,4 @@
 use crate::builder::VoyageBuilder;
-use crate::client::rerank_client::RerankRequest;
 use crate::client::RateLimiter;
 
 #[derive(Debug, Clone)]

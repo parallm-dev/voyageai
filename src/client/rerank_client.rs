@@ -96,7 +96,7 @@ impl RerankClientBuilder {
 
 #[async_trait]
 pub trait Rerank {
-    async fn rerank(&self, request: RerankRequest) -> Result<RerankResponse, VoyageError>;
+    async fn rerank(&self, request: RerankRequest<'_>) -> Result<RerankResponse, VoyageError>;
 }
 
 #[async_trait]
