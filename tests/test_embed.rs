@@ -15,7 +15,7 @@ async fn test_embeddings_with_multiple_inputs() {
         .build()
         .expect("Failed to build embeddings request");
 
-    let response = embeddings_request.send(&client).await;
+    let response = client.embeddings().create_embedding(&embeddings_request).await;
     assert!(response.is_ok());
     let embeddings_response = response.unwrap();
     assert_eq!(embeddings_response.data.len(), inputs.len());
