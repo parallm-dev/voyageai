@@ -132,15 +132,15 @@ pub enum EmbeddingsInput {
     Multiple(Vec<String>),
 }
 
-impl From<String> for EmbeddingsInput {
-    fn from(s: String) -> Self {
-        EmbeddingsInput::Single(s)
+impl<T: Into<String>> From<T> for EmbeddingsInput {
+    fn from(s: T) -> Self {
+        EmbeddingsInput::Single(s.into())
     }
 }
 
-impl From<Vec<String>> for EmbeddingsInput {
-    fn from(v: Vec<String>) -> Self {
-        EmbeddingsInput::Multiple(v)
+impl<T: Into<String>> From<Vec<T>> for EmbeddingsInput {
+    fn from(v: Vec<T>) -> Self {
+        EmbeddingsInput::Multiple(v.into_iter().map(Into::into).collect())
     }
 }
 
