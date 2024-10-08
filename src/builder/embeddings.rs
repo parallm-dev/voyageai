@@ -55,7 +55,7 @@ impl EmbeddingsRequestBuilder {
     }
 
     pub fn input(mut self, input: Vec<String>) -> Self {
-        self.input = Some(input);
+        self.input = Some(EmbeddingsInput::Multiple(input));
         self
     }
 
