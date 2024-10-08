@@ -20,6 +20,14 @@ impl VoyageAiClient {
     pub fn rerank(&self) -> &crate::client::rerank_client::RerankClient {
         &self.rerank_client
     }
+
+    pub fn embeddings_mut(&mut self) -> &mut crate::client::embeddings_client::EmbeddingClient {
+        &mut self.embeddings_client
+    }
+
+    pub fn rerank_mut(&mut self) -> &mut crate::client::rerank_client::RerankClient {
+        &mut self.rerank_client
+    }
 }
 
 impl Default for VoyageAiClient {

@@ -32,10 +32,10 @@ pub struct RerankClient {
 }
 
 impl RerankClient {
-    pub fn new(api_key: String) -> Self {
+    pub fn new(api_key: impl Into<String>) -> Self {
         Self {
             client: Client::new(),
-            api_key,
+            api_key: api_key.into(),
         }
     }
 

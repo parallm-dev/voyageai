@@ -4,6 +4,7 @@ use crate::VoyageAiClient;
 use crate::VoyageError;
 use std::collections::HashMap;
 
+#[derive(Debug, Clone)]
 pub struct GenerateOptions {
     pub model: EmbeddingModel,
     pub max_tokens: usize,

@@ -26,6 +26,12 @@ pub struct EmbeddingClient {
     config: VoyageConfig,
 }
 
+impl Default for EmbeddingClient {
+    fn default() -> Self {
+        Self::new(VoyageConfig::default())
+    }
+}
+
 impl EmbeddingClient {
     pub fn new(config: VoyageConfig) -> Self {
         Self {
