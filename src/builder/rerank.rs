@@ -22,7 +22,11 @@ impl RerankRequestBuilder {
         self
     }
 
-    pub fn documents(mut self, documents: impl IntoIterator<Item = impl Into<String>>) -> Self {
+    pub fn documents<I, T>(mut self, documents: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<String>,
+    {
         self.documents = Some(documents.into_iter().map(Into::into).collect());
         self
     }

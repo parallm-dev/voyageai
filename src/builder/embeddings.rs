@@ -138,9 +138,9 @@ impl<T: Into<String>> From<T> for EmbeddingsInput {
     }
 }
 
-impl<T: Into<String>> From<Vec<T>> for EmbeddingsInput {
-    fn from(v: Vec<T>) -> Self {
-        EmbeddingsInput::Multiple(v.into_iter().map(Into::into).collect())
+impl<T: Into<String>> FromIterator<T> for EmbeddingsInput {
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        EmbeddingsInput::Multiple(iter.into_iter().map(Into::into).collect())
     }
 }
 
