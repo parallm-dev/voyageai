@@ -54,8 +54,7 @@ impl EmbeddingClient {
     }
 
     pub fn input(&self, input: impl Into<String>) -> crate::builder::EmbeddingsRequestBuilder {
-        let input_string: String = input.into();
-        crate::builder::EmbeddingsRequestBuilder::new().input(vec![input_string])
+        crate::builder::EmbeddingsRequestBuilder::new().input(vec![input.into()])
     }
 
     pub fn input_multiple(&self, input: Vec<String>) -> crate::builder::EmbeddingsRequestBuilder {

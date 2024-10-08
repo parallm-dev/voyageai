@@ -15,7 +15,7 @@ mod tests {
             .embeddings()
             .input("test input")
             .model(EmbeddingModel::Voyage3)
-            .voyage(&client)
+            .voyage(client.clone())
             .build()
             .expect("Failed to build embeddings request");
 
