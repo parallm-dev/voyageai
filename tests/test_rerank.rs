@@ -9,8 +9,6 @@ async fn test_rerank() {
 
     let rerank_request = client
         .rerank()
-        .build()
-        .expect("Failed to build rerank request")
         .query("test query")
         .documents(vec!["doc1".to_string(), "doc2".to_string(), "doc3".to_string()])
         .model(RerankModel::V2)
