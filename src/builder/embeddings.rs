@@ -70,8 +70,8 @@ impl EmbeddingsRequestBuilder {
         self
     }
 
-    pub fn voyage(mut self, voyage: VoyageAiClient) -> Self {
-        self.voyage = Some(voyage);
+    pub fn voyage(mut self, voyage: &VoyageAiClient) -> Self {
+        self.voyage = Some(voyage.clone());
         self
     }
 
