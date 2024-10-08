@@ -33,9 +33,8 @@ mod tests {
 
         let embeddings_request = client
             .embeddings()
-            .input("test input")
+            .input(vec!["test input".to_string()])
             .model(EmbeddingModel::Voyage3)
-            .voyage(client.clone())
             .build()
             .expect("Failed to build embeddings request");
 
