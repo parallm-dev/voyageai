@@ -118,14 +118,16 @@ pub enum EmbeddingsInput {
     Multiple(Vec<String>),
 }
 
-#[derive(Debug)]
+use serde::Serialize;
+
+#[derive(Debug, Serialize)]
 pub struct EmbeddingsRequest {
-    pub input: EmbeddingsInput,
+    pub input: Vec<String>,
     pub model: EmbeddingModel,
-    pub input_type: Option<InputType>,
-    pub voyage: VoyageAiClient,
-    pub truncation: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub encoding_format: Option<EncodingFormat>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub user: Option<String>,
 }
 
 use crate::VoyageError;

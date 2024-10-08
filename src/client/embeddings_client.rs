@@ -1,8 +1,5 @@
-pub use crate::errors::VoyageError;
-pub use crate::models::EmbeddingData;
-use async_trait::async_trait;
 use reqwest::Client;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use crate::builder::EmbeddingsRequest;
 use crate::config::VoyageConfig;
 use crate::errors::VoyageError;
