@@ -88,7 +88,7 @@ impl EmbeddingsRequestBuilder {
     pub fn build(self) -> Result<EmbeddingsRequest, EmbeddingsBuilderError> {
         let input = self.input.ok_or(EmbeddingsBuilderError::MissingInput)?;
         let model = self.model.ok_or(EmbeddingsBuilderError::MissingModel)?;
-        let voyage = self.voyage.ok_or(EmbeddingsBuilderError::MissingVoyage)?;
+        let _voyage = self.voyage.ok_or(EmbeddingsBuilderError::MissingVoyage)?;
 
         if let EmbeddingsInput::Multiple(ref texts) = input {
             if texts.len() > 128 {
@@ -131,7 +131,7 @@ pub struct EmbeddingsRequest {
 }
 
 impl EmbeddingsRequest {
-    pub async fn send(self, client: &VoyageAiClient) -> Result<EmbeddingsResponse, VoyageError> {
+    pub async fn send(self, client: &VoyageAiClient) -> Result<crate::client::embeddings_client::EmbeddingsResponse, VoyageError> {
         client.embeddings().create_embedding(&self).await
     }
 }
