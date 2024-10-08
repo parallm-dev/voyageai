@@ -87,12 +87,12 @@ pub fn embeddings() -> EmbeddingsRequestBuilder {
     EmbeddingsRequestBuilder::new()
 }
 
-pub fn rerank() -> RerankClientBuilder {
-    RerankClientBuilder::new()
+pub fn rerank() -> crate::client::rerank_client::RerankClientBuilder {
+    crate::client::rerank_client::RerankClientBuilder::new()
 }
 
-pub fn rerank_request_builder() -> RerankRequestBuilder {
-    RerankRequestBuilder::new(&VoyageAiClient::builder().build().unwrap())
+pub fn rerank_request_builder() -> RerankRequestBuilder<'static> {
+    RerankRequestBuilder::new(&crate::client::voyage_client::VoyageAiClient::builder().build().unwrap())
 }
 
 pub use crate::builder::embeddings::EmbeddingsRequest;
