@@ -1,4 +1,4 @@
-use voyage::{embeddings, rerank, EmbeddingModel, RerankModel};
+use voyageai::{embeddings, rerank, EmbeddingModel, RerankModel};
 
 #[tokio::main]
 async fn main() {

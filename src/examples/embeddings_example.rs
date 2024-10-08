@@ -1,4 +1,4 @@
-use voyage::{embeddings, EmbeddingModel};
+use voyageai::{embeddings, EmbeddingModel};
 
 #[tokio::main]
 async fn main() {
