@@ -91,7 +91,7 @@ pub fn rerank() -> crate::client::rerank_client::RerankClientBuilder {
     crate::client::rerank_client::RerankClientBuilder::new()
 }
 
-pub fn rerank_request_builder() -> RerankRequestBuilder<'static> {
+pub fn rerank_request_builder() -> RerankRequestBuilder {
     let client = crate::client::voyage_client::VoyageAiClient::builder().build().unwrap();
     RerankRequestBuilder::new(client)
 }

@@ -43,9 +43,9 @@ impl RerankClient {
         RerankClientBuilder::default()
     }
 
-    pub async fn rerank<'a>(
+    pub async fn rerank(
         &self,
-        request: RerankRequest<'a>,
+        request: RerankRequest,
     ) -> Result<RerankResponse, VoyageError> {
         let url = format!("{}/rerank", BASE_URL);
 
@@ -96,12 +96,12 @@ impl RerankClientBuilder {
 
 #[async_trait]
 pub trait Rerank {
-    async fn rerank(&self, request: RerankRequest<'_>) -> Result<RerankResponse, VoyageError>;
+    async fn rerank(&self, request: RerankRequest) -> Result<RerankResponse, VoyageError>;
 }
 
 #[async_trait]
 impl Rerank for RerankClient {
-    async fn rerank(&self, request: RerankRequest<'_>) -> Result<RerankResponse, VoyageError> {
+    async fn rerank(&self, request: RerankRequest) -> Result<RerankResponse, VoyageError> {
         self.rerank(request).await
     }
 }
