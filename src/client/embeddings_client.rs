@@ -32,6 +32,8 @@ pub struct EmbeddingClient {
 
 pub type EmbeddingsClient = EmbeddingClient;
 
+use crate::builder::EmbeddingsRequest;
+
 impl EmbeddingClient {
     pub fn new(config: VoyageConfig) -> Self {
         Self {
