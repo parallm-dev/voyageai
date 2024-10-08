@@ -6,8 +6,8 @@ pub struct VoyageAiClient {
     pub api_key: String,
     pub client: reqwest::Client,
     pub embeddings_client: crate::client::embeddings_client::EmbeddingClient,
-    pub rate_limiter: RateLimiter,
     pub rerank_client: crate::client::rerank_client::RerankClient,
+    pub rate_limiter: RateLimiter,
 }
 
 impl VoyageAiClient {
