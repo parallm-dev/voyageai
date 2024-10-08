@@ -62,8 +62,8 @@ impl EmbeddingsRequestBuilder {
         }
     }
 
-    pub fn with_client(mut self, voyage: impl Into<VoyageAiClient>) -> Self {
-        self.voyage = Some(voyage.into());
+    pub fn with_client(mut self, voyage: &VoyageAiClient) -> Self {
+        self.voyage = Some(voyage.clone());
         self
     }
 
