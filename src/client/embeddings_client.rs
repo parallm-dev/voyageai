@@ -6,6 +6,7 @@ pub use crate::models::EmbeddingsResult;
 pub use crate::config::VoyageConfig;
 pub use crate::errors::VoyageBuilderError;
 
+use reqwest::Client;
 use serde::Deserialize;
 
 pub const BASE_URL: &str = "https://api.voyageai.com/v1";
@@ -23,15 +24,30 @@ pub struct Usage {
     pub total_tokens: u32,
 }
 
-impl EmbeddingsResult {
-    pub async fn send(&self, config: &VoyageConfig) -> Result<EmbeddingsResponse, VoyageError> {
-        let client = reqwest::Client::new();
+pub struct EmbeddingClient {
+    client: Client,
+    config: VoyageConfig,
+}
+
+impl EmbeddingClient {
+    pub fn new(config: VoyageConfig) -> Self {
+        Self {
+            client: Client::new(),
+            config,
+        }
+    }
+
+    pub async fn create_embedding(
+        &self,
+        result: &EmbeddingsResult,
+    ) -> Result<EmbeddingsResponse, VoyageError> {
         let url = format!("{}/embeddings", BASE_URL);
 
-        let response = client
+        let response = self
+            .client
             .post(&url)
-            .bearer_auth(&config.api_key)
-            .json(&self.data)
+            .bearer_auth(&self.config.api_key)
+            .json(&result.data)
             .send()
             .await?;
 

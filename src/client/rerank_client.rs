@@ -1,3 +1,5 @@
+use async_trait::async_trait;
+use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
 pub const BASE_URL: &str = "https://api.voyageai.com/v1";
@@ -23,15 +25,32 @@ pub struct Usage {
 
 pub use crate::client::voyage_client::VoyageAiClient;
 
-impl RerankRequest {
-    pub async fn send(self) -> Result<RerankResponse, VoyageError> {
-        let client = reqwest::Client::new();
+#[derive(Clone, Debug)]
+pub struct RerankClient {
+    client: Client,
+    api_key: String,
+}
+
+impl RerankClient {
+    pub fn new(client: Client, api_key: String) -> Self {
+        Self { client, api_key }
+    }
+
+    pub fn builder() -> RerankClientBuilder {
+        RerankClientBuilder::default()
+    }
+
+    pub async fn rerank<'a>(
+        &self,
+        request: RerankRequest<'a>,
+    ) -> Result<RerankResponse, VoyageError> {
         let url = format!("{}/rerank", BASE_URL);
 
-        let response = client
+        let response = self
+            .client
             .post(&url)
-            .bearer_auth(&self.voyage.api_key)
-            .json(&self)
+            .bearer_auth(&self.api_key)
+            .json(&request)
             .send()
             .await?;
 
@@ -41,6 +60,46 @@ impl RerankRequest {
         } else {
             Err(VoyageError::ApiError(response.text().await?))
         }
+    }
+}
+#[derive(Default)]
+pub struct RerankClientBuilder {
+    api_key: Option<String>,
+    client: Option<Client>,
+}
+
+impl RerankClientBuilder {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn api_key(mut self, api_key: String) -> Self {
+        self.api_key = Some(api_key);
+        self
+    }
+
+    pub fn client(mut self, client: Client) -> Self {
+        self.client = Some(client);
+        self
+    }
+
+    pub fn build(self) -> Result<RerankClient, VoyageError> {
+        let api_key = self.api_key.ok_or(VoyageError::MissingApiKey)?;
+        let client = self.client.unwrap_or_else(Client::new);
+
+        Ok(RerankClient { client, api_key })
+    }
+}
+
+#[async_trait]
+pub trait Rerank {
+    async fn rerank(&self, request: RerankRequest) -> Result<RerankResponse, VoyageError>;
+}
+
+#[async_trait]
+impl Rerank for RerankClient {
+    async fn rerank(&self, request: RerankRequest<'_>) -> Result<RerankResponse, VoyageError> {
+        self.rerank(request).await
     }
 }
 
@@ -70,5 +129,5 @@ impl RerankResponse {
     }
 }
 
-pub use crate::client::RerankRequest;
+pub use crate::builder::RerankRequest;
 pub use crate::errors::VoyageError;

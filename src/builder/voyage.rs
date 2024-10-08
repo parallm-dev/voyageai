@@ -1,10 +1,7 @@
 use crate::client::client_limiter::RateLimiter;
-use crate::client::{EmbeddingsRequest, EmbeddingsResponse};
-use crate::client::{RerankRequest, RerankResponse};
+use crate::client::rerank_client::RerankClient;
 use crate::config::VoyageConfig;
 use crate::errors::VoyageBuilderError;
-use crate::models::EmbeddingModel;
-use crate::models::RerankModel;
 use crate::EmbeddingsRequestBuilder;
 use crate::RerankRequestBuilder;
 
@@ -24,8 +21,18 @@ impl VoyageAiClient {
         EmbeddingsRequestBuilder::new()
     }
 
-    pub fn rerank(&self) -> RerankRequestBuilder {
-        RerankRequestBuilder::new(self.clone())
+    pub fn rerank(&self) -> RerankClient {
+        RerankClient::new(self.api_key.clone())
+    }
+}
+
+impl Default for VoyageAiClient {
+    fn default() -> Self {
+        Self {
+            api_key: String::new(),
+            client: reqwest::Client::new(),
+            rate_limiter: RateLimiter::new(std::time::Duration::from_secs(1)),
+        }
     }
 }
 
@@ -80,6 +87,15 @@ pub fn embeddings() -> EmbeddingsRequestBuilder {
     EmbeddingsRequestBuilder::new()
 }
 
-pub fn rerank() -> RerankRequestBuilder {
-    RerankRequestBuilder::new()
+pub fn rerank() -> RerankClientBuilder {
+    RerankClientBuilder::new()
 }
+
+pub fn rerank_request_builder() -> RerankRequestBuilder {
+    RerankRequestBuilder::new(&VoyageAiClient::builder().build().unwrap())
+}
+
+pub fn rank_request_builder() -> RankRequestBuilder {}
+
+pub use crate::builder::embeddings::EmbeddingsRequest;
+pub use crate::builder::rerank::RerankRequest;

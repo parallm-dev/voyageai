@@ -1,13 +1,15 @@
 use crate::builder::VoyageBuilder;
-use crate::embeddings_client::EmbeddingsClient;
+use crate::client::rerank_client::RerankRequest;
+use crate::client::RateLimiter;
 
 #[derive(Debug, Clone)]
 pub struct VoyageAiClient {
     pub api_key: String,
     pub client: reqwest::Client,
-    pub embeddings_client: EmbeddingsClient,
+    pub embeddings_client: crate::client::embeddings_client::EmbeddingClient,
     pub rate_limiter: RateLimiter,
-    pub rerank_client: RerankClient,
+    #[derive(Debug, Clone)]
+    pub rerank_client: crate::client::rerank_client::RerankClient,
 }
 
 impl VoyageAiClient {
@@ -15,11 +17,11 @@ impl VoyageAiClient {
         VoyageBuilder::new()
     }
 
-    pub fn embeddings(&self) -> &EmbeddingsClient {
+    pub fn embeddings(&self) -> &crate::client::embeddings_client::EmbeddingsClient {
         &self.embeddings_client
     }
 
-    pub fn rerank(&self) -> &crate::rerank_client::RerankClient {
+    pub fn rerank(&self) -> &crate::client::rerank_client::RerankClient {
         &self.rerank_client
     }
 
