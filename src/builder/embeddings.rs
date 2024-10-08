@@ -128,6 +128,9 @@ pub struct EmbeddingsRequest {
     pub encoding_format: Option<EncodingFormat>,
 }
 
+use crate::VoyageError;
+use crate::client::embeddings_client::EmbeddingsResponse;
+
 impl EmbeddingsRequest {
     pub async fn send(self) -> Result<EmbeddingsResponse, VoyageError> {
         self.voyage.embeddings().create_embedding(&self).await
