@@ -60,7 +60,7 @@ impl EmbeddingClient {
     }
 
     pub fn input<T: Into<String>>(&self, input: T) -> crate::builder::EmbeddingsRequestBuilder {
-        crate::builder::EmbeddingsRequestBuilder::new().input(input)
+        crate::builder::EmbeddingsRequestBuilder::new(self.client.clone()).input(input)
     }
 
     pub fn input_multiple<I, T>(&self, input: I) -> crate::builder::EmbeddingsRequestBuilder
@@ -68,7 +68,7 @@ impl EmbeddingClient {
         I: IntoIterator<Item = T>,
         T: Into<String>,
     {
-        crate::builder::EmbeddingsRequestBuilder::new().input_multiple(input)
+        crate::builder::EmbeddingsRequestBuilder::new(self.client.clone()).input_multiple(input)
     }
 }
 

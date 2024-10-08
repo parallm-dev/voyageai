@@ -40,19 +40,30 @@ pub struct Usage {
     pub total_tokens: u32,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct EmbeddingsRequestBuilder {
     input: Option<EmbeddingsInput>,
     model: Option<EmbeddingModel>,
     input_type: Option<InputType>,
-    voyage: Option<VoyageAiClient>,
+    voyage: VoyageAiClient,
     truncation: Option<bool>,
     encoding_format: Option<EncodingFormat>,
 }
 
 impl EmbeddingsRequestBuilder {
-    pub fn new() -> Self {
-        Default::default()
+    pub fn new(voyage: VoyageAiClient) -> Self {
+        Self {
+            input: None,
+            model: None,
+            input_type: None,
+            voyage,
+            truncation: None,
+            encoding_format: None,
+        }
+    }
+
+    pub fn with_client(voyage: VoyageAiClient) -> Self {
+        Self::new(voyage)
     }
 
     pub fn input<T: Into<EmbeddingsInput>>(mut self, input: T) -> Self {
@@ -97,7 +108,6 @@ impl EmbeddingsRequestBuilder {
     pub fn build(self) -> Result<EmbeddingsRequest, EmbeddingsBuilderError> {
         let input = self.input.ok_or(EmbeddingsBuilderError::MissingInput)?;
         let model = self.model.ok_or(EmbeddingsBuilderError::MissingModel)?;
-        let _voyage = self.voyage.ok_or(EmbeddingsBuilderError::MissingVoyage)?;
 
         match &input {
             EmbeddingsInput::Single(_) => {},
