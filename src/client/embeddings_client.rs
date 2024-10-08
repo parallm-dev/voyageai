@@ -40,6 +40,10 @@ impl EmbeddingClient {
         }
     }
 
+    pub fn input(&self, input: impl Into<String>) -> crate::builder::EmbeddingsRequestBuilder {
+        crate::builder::EmbeddingsRequestBuilder::new().input(input)
+    }
+
     pub async fn create_embedding(
         &self,
         result: &EmbeddingsResult,

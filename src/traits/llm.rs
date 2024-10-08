@@ -163,7 +163,7 @@ pub async fn llm(
         usage: crate::models::Usage { total_tokens: 0 },
     };
 
-    let response = client
+    let _response = client
         .embeddings()
         .create_embedding(&embeddings_result)
         .await?;

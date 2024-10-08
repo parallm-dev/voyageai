@@ -1,4 +1,4 @@
-use voyage::{embeddings, EmbeddingModel};
+use voyageai::{embeddings, EmbeddingModel};
 
 #[tokio::test]
 async fn test_embeddings_with_multiple_inputs() {

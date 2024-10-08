@@ -1,4 +1,4 @@
-use voyage::{rerank, RerankModel};
+use voyageai::{rerank, RerankModel};
 
 #[tokio::test]
 async fn test_rerank() {
