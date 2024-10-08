@@ -15,7 +15,7 @@ impl VoyageAiClient {
         VoyageBuilder::new()
     }
 
-    pub fn embeddings(&self) -> &crate::client::embeddings_client::EmbeddingsClient {
+    pub fn embeddings(&self) -> &crate::client::embeddings_client::EmbeddingClient {
         &self.embeddings_client
     }
 
