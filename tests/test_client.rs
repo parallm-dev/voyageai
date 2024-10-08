@@ -1,4 +1,5 @@
 use voyageai::{VoyageAiClient, EmbeddingModel};
+use voyageai::builder::VoyageBuilder;
 
 #[cfg(test)]
 mod tests {
@@ -6,7 +7,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_embeddings() {
-        let client = VoyageAiClient::builder()
+        let client = VoyageBuilder::new()
             .api_key("test_api_key")
             .build()
             .expect("Failed to build client");
