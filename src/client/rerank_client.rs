@@ -118,7 +118,7 @@ impl std::fmt::Display for RerankResponse {
             )?;
         }
         writeln!(f, "Prompt tokens: {}", self.usage.prompt_tokens)?;
-        writeln!(f, "Total tokens: {}", self.usage.total_tokens)
+        write!(f, "Total tokens: {}", self.usage.total_tokens)
     }
 }
 

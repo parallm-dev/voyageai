@@ -107,6 +107,7 @@ impl GenerateOptionsBuilder {
     }
 }
 
+#[derive(Debug)]
 pub struct GenerateResponse {
     pub text: String,
     pub finish_reason: String,
@@ -116,12 +117,14 @@ pub struct GenerateResponse {
     pub choices: Vec<Choice>,
 }
 
+#[derive(Debug)]
 pub struct Usage {
     pub prompt_tokens: u32,
     pub completion_tokens: u32,
     pub total_tokens: u32,
 }
 
+#[derive(Debug)]
 pub struct Choice {
     pub text: String,
     pub index: usize,
@@ -129,6 +132,7 @@ pub struct Choice {
     pub finish_reason: String,
 }
 
+#[derive(Debug)]
 pub struct LogProbs {
     pub tokens: Vec<String>,
     pub token_logprobs: Vec<f32>,

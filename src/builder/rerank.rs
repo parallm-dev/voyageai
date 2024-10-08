@@ -83,11 +83,7 @@ pub struct RerankRequest {
 }
 
 impl RerankRequest {
-    pub fn share(&self) -> RerankRequest {
+    pub fn share(&self) -> Self {
         self.clone()
-    }
-
-    pub fn request(&self) -> &RerankRequest {
-        self
     }
 }
