@@ -20,19 +20,22 @@ async fn test_embeddings_similarity() {
     let dissimilar_query = "The economic impact of climate change on agriculture";
 
     // Generate embeddings for the document and queries
-    let generate_embedding = |text: String| async move {
-        let request = client
-            .embeddings()
-            .input(text)
-            .model(EmbeddingModel::Voyage3)
-            .build()
-            .expect("Failed to build embeddings request");
+    let generate_embedding = |text: String| {
+        let client = client.clone();
+        async move {
+            let request = client
+                .embeddings()
+                .input(text)
+                .model(EmbeddingModel::Voyage3)
+                .build()
+                .expect("Failed to build embeddings request");
 
-        client.embeddings().create_embedding(&request).await
-            .expect("Failed to create embedding")
-            .data[0]
-            .embedding
-            .clone()
+            client.embeddings().create_embedding(&request).await
+                .expect("Failed to create embedding")
+                .data[0]
+                .embedding
+                .clone()
+        }
     };
 
     let document_embedding = generate_embedding(obscure_document.to_string()).await;
