@@ -1,5 +1,5 @@
-use voyageai::{VoyageAiClient, EmbeddingModel};
-use voyageai::builder::VoyageBuilder;
+use voyageai::{EmbeddingModel, VoyageAiClient};
+use voyageai::builder::{VoyageBuilder, EmbeddingsRequestBuilder};
 
 #[cfg(test)]
 mod tests {
@@ -12,11 +12,9 @@ mod tests {
             .build()
             .expect("Failed to build client");
 
-        let embeddings_request = client
-            .embeddings()
-            .input("test input")
+        let embeddings_request = EmbeddingsRequestBuilder::new()
+            .input(vec!["test input".to_string()])
             .model(EmbeddingModel::Voyage3)
-            .voyage(client.clone())
             .build()
             .expect("Failed to build embeddings request");
 
