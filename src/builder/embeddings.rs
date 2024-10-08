@@ -116,7 +116,6 @@ pub enum InputType {
 
 #[derive(Debug)]
 pub enum EmbeddingsInput {
-    Single(String),
     Multiple(Vec<String>),
 }
 
