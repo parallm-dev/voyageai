@@ -45,6 +45,31 @@ impl EmbeddingClient {
         }
     }
 
+    pub async fn create_embedding(&self, request: &EmbeddingsRequest) -> Result<EmbeddingsResponse, VoyageError> {
+        let url = format!("{}/embeddings", BASE_URL);
+
+        let response = self
+            .client
+            .post(&url)
+            .bearer_auth(&self.config.api_key)
+            .json(request)
+            .send()
+            .await?;
+
+        if response.status().is_success() {
+            let embeddings_response = response.json::<EmbeddingsResponse>().await?;
+            Ok(embeddings_response)
+        } else {
+            Err(VoyageError::ApiError(response.text().await?))
+        }
+    }
+    pub fn new(config: VoyageConfig) -> Self {
+        Self {
+            client: Client::new(),
+            config,
+        }
+    }
+
     pub fn input(&self, input: impl Into<String>) -> crate::builder::EmbeddingsRequestBuilder {
         let input_string: String = input.into();
         crate::builder::EmbeddingsRequestBuilder::new().input(vec![input_string])
