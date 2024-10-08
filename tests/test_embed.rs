@@ -1,5 +1,5 @@
 use voyageai::{VoyageAiClient, models::EmbeddingModel};
-use voyageai::builder::embeddings::EmbeddingsRequestBuilder;
+use voyageai::builder::EmbeddingsRequestBuilder;
 
 #[tokio::test]
 async fn test_embeddings_with_multiple_inputs() {
