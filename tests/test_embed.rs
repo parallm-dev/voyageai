@@ -1,8 +1,8 @@
-use voyageai::{VoyageAiClient, EmbeddingModel};
+use voyageai::{EmbeddingModel};
 
 #[tokio::test]
 async fn test_embeddings_with_multiple_inputs() {
-    let client = embeddings()
+    let client = VoyageAiClient::builder()
         .api_key("test_api_key")
         .build()
         .expect("Failed to build embeddings client");

@@ -1,5 +1,4 @@
 use voyageai::{VoyageAiClient, EmbeddingModel};
-use voyageai::client::embeddings_client::EmbeddingsResponse;
 
 #[cfg(test)]
 mod tests {

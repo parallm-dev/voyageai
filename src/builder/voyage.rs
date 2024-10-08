@@ -66,10 +66,10 @@ impl VoyageBuilder {
             .or_else(|| std::env::var("VOYAGEAI_API_KEY").ok())
             .ok_or(VoyageBuilderError::ApiKeyNotSet)?;
 
-        let client = self.client.unwrap_or_default();
+        let _client = self.client.unwrap_or_default();
         let config = self.config.unwrap_or_else(VoyageConfig::default);
 
-        let rate_limiter = RateLimiter::new(config.rate_limit_duration);
+        let _rate_limiter = RateLimiter::new(config.rate_limit_duration);
 
         let embeddings_client = crate::client::embeddings_client::EmbeddingClient::new(config.clone());
         let rerank_client = crate::client::rerank_client::RerankClient::new(api_key.clone());

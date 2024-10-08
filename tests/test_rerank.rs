@@ -1,8 +1,8 @@
-use voyageai::{VoyageAiClient, RerankModel};
+use voyageai::{RerankModel};
 
 #[tokio::test]
 async fn test_rerank() {
-    let client = rerank()
+    let client = VoyageAiClient::builder()
         .api_key("test_api_key")
         .build()
         .expect("Failed to build rerank client");
