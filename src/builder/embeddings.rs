@@ -54,8 +54,8 @@ impl EmbeddingsRequestBuilder {
         Default::default()
     }
 
-    pub fn input<T: Into<EmbeddingsInput>>(mut self, input: T) -> Self {
-        self.input = Some(input.into());
+    pub fn input(mut self, input: Vec<String>) -> Self {
+        self.input = Some(input);
         self
     }
 

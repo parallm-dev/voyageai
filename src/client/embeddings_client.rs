@@ -41,7 +41,8 @@ impl EmbeddingClient {
     }
 
     pub fn input(&self, input: impl Into<String>) -> crate::builder::EmbeddingsRequestBuilder {
-        crate::builder::EmbeddingsRequestBuilder::new().input(input)
+        let input_string: String = input.into();
+        crate::builder::EmbeddingsRequestBuilder::new().input(vec![input_string])
     }
 
     pub async fn create_embedding(
