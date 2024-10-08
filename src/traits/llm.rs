@@ -17,6 +17,7 @@ pub struct GenerateOptions {
     pub user: Option<String>,
 }
 
+#[derive(Default)]
 pub struct GenerateOptionsBuilder {
     model: Option<EmbeddingModel>,
     max_tokens: Option<usize>,
@@ -28,23 +29,6 @@ pub struct GenerateOptionsBuilder {
     frequency_penalty: Option<f32>,
     logit_bias: Option<HashMap<String, f32>>,
     user: Option<String>,
-}
-
-impl Default for GenerateOptionsBuilder {
-    fn default() -> Self {
-        Self {
-            model: None,
-            max_tokens: None,
-            temperature: None,
-            top_p: None,
-            n: None,
-            stop: None,
-            presence_penalty: None,
-            frequency_penalty: None,
-            logit_bias: None,
-            user: None,
-        }
-    }
 }
 
 impl GenerateOptionsBuilder {
