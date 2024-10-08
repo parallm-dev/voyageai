@@ -45,25 +45,26 @@ pub struct EmbeddingsRequestBuilder {
     input: Option<EmbeddingsInput>,
     model: Option<EmbeddingModel>,
     input_type: Option<InputType>,
-    voyage: VoyageAiClient,
+    voyage: Option<VoyageAiClient>,
     truncation: Option<bool>,
     encoding_format: Option<EncodingFormat>,
 }
 
 impl EmbeddingsRequestBuilder {
-    pub fn new(voyage: VoyageAiClient) -> Self {
+    pub fn new() -> Self {
         Self {
             input: None,
             model: None,
             input_type: None,
-            voyage,
+            voyage: None,
             truncation: None,
             encoding_format: None,
         }
     }
 
-    pub fn with_client(voyage: VoyageAiClient) -> Self {
-        Self::new(voyage)
+    pub fn with_client(mut self, voyage: VoyageAiClient) -> Self {
+        self.voyage = Some(voyage);
+        self
     }
 
     pub fn input<T: Into<EmbeddingsInput>>(mut self, input: T) -> Self {
