@@ -12,6 +12,7 @@ async fn test_embeddings_with_multiple_inputs() {
         .embeddings()
         .input_multiple(inputs.clone())
         .model(EmbeddingModel::Voyage3)
+        .with_client(client.clone())
         .build()
         .expect("Failed to build embeddings request");
 
