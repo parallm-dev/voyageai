@@ -26,10 +26,26 @@ pub enum VoyageError {
     UnhandledStatusCode(u16, String),
     #[error("API error: {0}")]
     ApiError(String),
+    #[error("Rerank error: Invalid input")]
+    RerankInvalidInput,
+    #[error("Rerank error: Missing query")]
+    RerankMissingQuery,
+    #[error("Rerank error: Missing documents")]
+    RerankMissingDocuments,
 }
 
 #[derive(Error, Debug)]
 pub enum VoyageBuilderError {
     #[error("API key not set")]
     ApiKeyNotSet,
+    #[error("Missing required field: {0}")]
+    MissingField(String),
+    #[error("Input list too long for rerank")]
+    InputListTooLong,
+    #[error("Missing input for rerank")]
+    MissingInput,
+    #[error("Missing model for rerank")]
+    MissingModel,
+    #[error("Missing Voyage client for rerank")]
+    MissingVoyage,
 }

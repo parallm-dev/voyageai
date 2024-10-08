@@ -1,11 +1,13 @@
-use crate::builder::{VoyageBuilder, EmbeddingsRequestBuilder, RerankRequestBuilder};
-use crate::config::ClientConfig;
-use crate::limiter::RateLimiter;
+use crate::builder::VoyageBuilder;
+use crate::embeddings_client::EmbeddingsClient;
 
+#[derive(Debug, Clone)]
 pub struct VoyageAiClient {
-    pub(crate) api_key: String,
-    pub(crate) client: reqwest::Client,
-    pub(crate) rate_limiter: RateLimiter,
+    pub api_key: String,
+    pub client: reqwest::Client,
+    pub embeddings_client: EmbeddingsClient,
+    pub rate_limiter: RateLimiter,
+    pub rerank_client: RerankClient,
 }
 
 impl VoyageAiClient {
@@ -13,23 +15,13 @@ impl VoyageAiClient {
         VoyageBuilder::new()
     }
 
-    pub fn embeddings(&self) -> EmbeddingsRequestBuilder {
-        EmbeddingsRequestBuilder::new().voyage(self.clone())
+    pub fn embeddings(&self) -> &EmbeddingsClient {
+        &self.embeddings_client
     }
 
-    pub fn rerank(&self) -> RerankRequestBuilder {
-        RerankRequestBuilder::new().voyage(self.clone())
+    pub fn rerank(&self) -> &crate::rerank_client::RerankClient {
+        &self.rerank_client
     }
 
-    // ... Add any additional methods needed ...
-}
-
-impl Clone for VoyageAiClient {
-    fn clone(&self) -> Self {
-        Self {
-            api_key: self.api_key.clone(),
-            client: self.client.clone(),
-            rate_limiter: self.rate_limiter.clone(),
-        }
-    }
+    // ... additional methods needed ...
 }

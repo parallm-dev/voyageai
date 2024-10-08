@@ -1,5 +1,4 @@
 pub struct EmbeddingsResult {
-    pub object: Object,
     pub data: Vec<EmbeddingData>,
     pub model: EmbeddingModel,
     pub usage: Usage,
@@ -30,7 +29,7 @@ pub enum EmbeddingModel {
 }
 
 impl EmbeddingModel {
-    pub const fn context_length(&self) -> usize {
+    pub fn context_length(&self) -> usize {
         match self {
             Self::VoyageLarge2Instruct => 16000,
             Self::VoyageFinance2 => 32000,
@@ -44,7 +43,7 @@ impl EmbeddingModel {
         }
     }
 
-    pub const fn embedding_dimension(&self) -> usize {
+    pub fn embedding_dimension(&self) -> usize {
         match self {
             Self::VoyageLarge2Instruct => 1024,
             Self::VoyageFinance2 => 1024,
@@ -58,10 +57,13 @@ impl EmbeddingModel {
         }
     }
 }
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EmbeddingData {
-    pub object: Object,
+    pub object: String,
     pub embedding: Vec<f32>,
     pub index: usize,
 }
+
+pub use self::EmbeddingModel as Embedding;
+pub use self::EmbeddingsResult as EmbeddingsModel;
+pub use super::Usage;

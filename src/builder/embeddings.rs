@@ -8,7 +8,7 @@ pub enum Object {
     Embedding,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum EncodingFormat {
     #[serde(rename = "float")]
     Float,
@@ -35,8 +35,8 @@ pub struct EmbeddingData {
 pub struct Usage {
     pub total_tokens: u32,
 }
+use crate::errors::VoyageBuilderError as EmbeddingsBuilderError;
 use crate::models::EmbeddingModel;
-use crate::voyage_errors::EmbeddingsBuilderError;
 use crate::VoyageAiClient;
 use std::borrow::Cow;
 
@@ -117,11 +117,6 @@ pub enum InputType {
 pub enum EmbeddingsInput<'a> {
     Single(Cow<'a, str>),
     Multiple(Vec<Cow<'a, str>>),
-}
-
-#[derive(Debug)]
-pub enum EncodingFormat {
-    Base64,
 }
 
 #[derive(Debug)]

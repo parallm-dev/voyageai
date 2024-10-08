@@ -1,6 +1,7 @@
+use crate::client::VoyageAiClient;
+use crate::errors::VoyageBuilderError;
 use crate::models::RerankModel;
-use crate::voyage_errors::RerankBuilderError;
-use crate::VoyageAiClient;
+use serde::Serialize;
 
 #[derive(Debug, Default)]
 pub struct RerankRequestBuilder {
@@ -14,8 +15,11 @@ pub struct RerankRequestBuilder {
 }
 
 impl RerankRequestBuilder {
-    pub fn new() -> Self {
-        Default::default()
+    pub fn new(voyage: VoyageAiClient) -> Self {
+        Self {
+            voyage: Some(voyage),
+            ..Default::default()
+        }
     }
 
     pub fn query(mut self, query: impl Into<String>) -> Self {
@@ -48,40 +52,55 @@ impl RerankRequestBuilder {
         self
     }
 
-    pub fn voyage(mut self, voyage: VoyageAiClient) -> Self {
-        self.voyage = Some(voyage);
-        self
-    }
-
-    pub fn build(self) -> Result<RerankRequest, RerankBuilderError> {
-        let query = self.query.ok_or(RerankBuilderError::MissingQuery)?;
-        let documents = self.documents.ok_or(RerankBuilderError::MissingDocuments)?;
-        let model = self.model.ok_or(RerankBuilderError::MissingModel)?;
-        let voyage = self.voyage.ok_or(RerankBuilderError::MissingVoyage)?;
+    pub fn build(self) -> Result<RerankRequest, VoyageBuilderError> {
+        let query = self
+            .query
+            .ok_or(VoyageBuilderError::MissingField("query".to_string()))?;
+        let documents = self
+            .documents
+            .ok_or(VoyageBuilderError::MissingField("documents".to_string()))?;
+        let model = self.model.ok_or(VoyageBuilderError::MissingModel)?;
+        let voyage = self.voyage.ok_or(VoyageBuilderError::MissingVoyage)?;
 
         Ok(RerankRequest {
             query,
             documents,
             model,
             top_n: self.top_n,
-            truncate: self.truncate,
-            include_metadata: self.include_metadata,
+            truncate: self.truncate.unwrap_or(false),
+            include_metadata: self.include_metadata.unwrap_or(false),
             voyage,
         })
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct RerankRequest {
     pub query: String,
     pub documents: Vec<String>,
     pub model: RerankModel,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub top_n: Option<usize>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub truncate: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub include_metadata: Option<bool>,
+    pub truncate: bool,
+    pub include_metadata: bool,
     #[serde(skip)]
     pub voyage: VoyageAiClient,
+}
+
+impl RerankRequest {
+    pub fn share(&self) -> RerankRequest {
+        RerankRequest {
+            query: self.query.clone(),
+            documents: self.documents.clone(),
+            model: self.model.clone(),
+            top_n: self.top_n,
+            truncate: self.truncate,
+            include_metadata: self.include_metadata,
+            voyage: self.voyage.clone(),
+        }
+    }
+
+    pub fn request(&self) -> &RerankRequest {
+        self
+    }
 }

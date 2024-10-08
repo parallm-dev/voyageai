@@ -1,15 +1,39 @@
-use crate::builder::embeddings::EmbeddingsRequestBuilder;
-use crate::builder::rerank::RerankRequestBuilder;
-use crate::voyage_config::ClientConfig;
-use crate::voyage_errors::VoyageBuilderError;
-use crate::voyage_limiter::RateLimiter;
-use crate::VoyageAiClient;
+use crate::client::client_limiter::RateLimiter;
+use crate::client::{EmbeddingsRequest, EmbeddingsResponse};
+use crate::client::{RerankRequest, RerankResponse};
+use crate::config::VoyageConfig;
+use crate::errors::VoyageBuilderError;
+use crate::models::EmbeddingModel;
+use crate::models::RerankModel;
+use crate::EmbeddingsRequestBuilder;
+use crate::RerankRequestBuilder;
+
+#[derive(Clone, Debug)]
+pub struct VoyageAiClient {
+    pub(crate) api_key: String,
+    pub(crate) client: reqwest::Client,
+    pub(crate) rate_limiter: RateLimiter,
+}
+
+impl VoyageAiClient {
+    pub fn builder() -> VoyageBuilder {
+        VoyageBuilder::new()
+    }
+
+    pub fn embeddings(&self) -> EmbeddingsRequestBuilder {
+        EmbeddingsRequestBuilder::new()
+    }
+
+    pub fn rerank(&self) -> RerankRequestBuilder {
+        RerankRequestBuilder::new(self.clone())
+    }
+}
 
 #[derive(Debug, Default)]
 pub struct VoyageBuilder {
     api_key: Option<String>,
     client: Option<reqwest::Client>,
-    config: Option<ClientConfig>,
+    config: Option<VoyageConfig>,
 }
 
 impl VoyageBuilder {
@@ -27,7 +51,7 @@ impl VoyageBuilder {
         self
     }
 
-    pub fn config(mut self, config: ClientConfig) -> Self {
+    pub fn config(mut self, config: VoyageConfig) -> Self {
         self.config = Some(config);
         self
     }
@@ -40,7 +64,7 @@ impl VoyageBuilder {
             .ok_or(VoyageBuilderError::ApiKeyNotSet)?;
 
         let client = self.client.unwrap_or_default();
-        let config = self.config.unwrap_or_default();
+        let config = self.config.unwrap_or_else(VoyageConfig::default);
 
         let rate_limiter = RateLimiter::new(config.rate_limit_duration);
 

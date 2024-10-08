@@ -1,16 +1,17 @@
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::sync::Mutex;
 
 #[derive(Debug, Clone)]
 pub struct RateLimiter {
-    last_request_time: Mutex<Instant>,
+    last_request_time: Arc<Mutex<Instant>>,
     pub rate_limit_duration: Duration,
 }
 
 impl RateLimiter {
     pub fn new(rate_limit_duration: Duration) -> Self {
         Self {
-            last_request_time: Mutex::new(Instant::now()),
+            last_request_time: Arc::new(Mutex::new(Instant::now())),
             rate_limit_duration,
         }
     }
