@@ -9,6 +9,7 @@ async fn test_embeddings_with_multiple_inputs() {
 
     let inputs = vec!["first input", "second input", "third input"];
     let embeddings_request = client
+        .embeddings()
         .input(inputs.clone())
         .model(EmbeddingModel::Voyage3)
         .build()
