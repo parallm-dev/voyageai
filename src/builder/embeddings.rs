@@ -132,6 +132,6 @@ use crate::VoyageError;
 
 impl EmbeddingsRequest {
     pub async fn send(self) -> Result<EmbeddingsResponse, VoyageError> {
-        self.voyage.embeddings().create_embedding(self).await
+        self.voyage.embeddings().create_embedding(&EmbeddingsRequest::from(self)).await
     }
 }
