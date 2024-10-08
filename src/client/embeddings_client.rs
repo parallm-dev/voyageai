@@ -45,6 +45,10 @@ impl EmbeddingClient {
         crate::builder::EmbeddingsRequestBuilder::new().input(vec![input_string])
     }
 
+    pub fn input_multiple(&self, input: Vec<String>) -> crate::builder::EmbeddingsRequestBuilder {
+        crate::builder::EmbeddingsRequestBuilder::new().input(input)
+    }
+
     pub async fn create_embedding(
         &self,
         result: &EmbeddingsResult,
