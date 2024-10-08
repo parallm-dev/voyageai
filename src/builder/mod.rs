@@ -1,6 +1,6 @@
 mod embeddings;
 mod rerank;
-mod voyage;
+pub mod voyage;
 
 pub use embeddings::EmbeddingsRequestBuilder;
 pub use rerank::RerankRequestBuilder;
