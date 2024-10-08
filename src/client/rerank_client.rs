@@ -32,8 +32,11 @@ pub struct RerankClient {
 }
 
 impl RerankClient {
-    pub fn new(client: Client, api_key: String) -> Self {
-        Self { client, api_key }
+    pub fn new(api_key: String) -> Self {
+        Self {
+            client: Client::new(),
+            api_key,
+        }
     }
 
     pub fn builder() -> RerankClientBuilder {
@@ -62,6 +65,12 @@ impl RerankClient {
         }
     }
 }
+#[derive(Default)]
+pub struct RerankClientBuilder {
+    api_key: Option<String>,
+    client: Option<Client>,
+}
+
 #[derive(Default)]
 pub struct RerankClientBuilder {
     api_key: Option<String>,
@@ -98,7 +107,7 @@ pub trait Rerank {
 
 #[async_trait]
 impl Rerank for RerankClient {
-    async fn rerank(&self, request: RerankRequest<'_>) -> Result<RerankResponse, VoyageError> {
+    async fn rerank(&self, request: RerankRequest) -> Result<RerankResponse, VoyageError> {
         self.rerank(request).await
     }
 }

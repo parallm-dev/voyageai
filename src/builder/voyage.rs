@@ -95,7 +95,5 @@ pub fn rerank_request_builder() -> RerankRequestBuilder {
     RerankRequestBuilder::new(&VoyageAiClient::builder().build().unwrap())
 }
 
-pub fn rank_request_builder() -> RankRequestBuilder {}
-
 pub use crate::builder::embeddings::EmbeddingsRequest;
 pub use crate::builder::rerank::RerankRequest;

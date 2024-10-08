@@ -8,6 +8,8 @@ pub enum VoyageError {
     Unauthorized,
     #[error("Rate limit exceeded")]
     RateLimitExceeded,
+    #[error("Missing API key")]
+    MissingApiKey,
     #[error("Server error: {0}")]
     ServerError(String),
     #[error("Service unavailable")]

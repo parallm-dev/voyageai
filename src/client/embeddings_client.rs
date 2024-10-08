@@ -24,10 +24,14 @@ pub struct Usage {
     pub total_tokens: u32,
 }
 
+#[derive(Debug, Clone)]
+#[derive(Debug, Clone)]
 pub struct EmbeddingClient {
     client: Client,
     config: VoyageConfig,
 }
+
+pub type EmbeddingsClient = EmbeddingClient;
 
 impl EmbeddingClient {
     pub fn new(config: VoyageConfig) -> Self {

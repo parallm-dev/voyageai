@@ -8,7 +8,6 @@ pub struct VoyageAiClient {
     pub client: reqwest::Client,
     pub embeddings_client: crate::client::embeddings_client::EmbeddingClient,
     pub rate_limiter: RateLimiter,
-    #[derive(Debug, Clone)]
     pub rerank_client: crate::client::rerank_client::RerankClient,
 }
 
