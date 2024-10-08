@@ -1,8 +1,6 @@
 use crate::client::client_limiter::RateLimiter;
 use crate::config::VoyageConfig;
 use crate::errors::VoyageBuilderError;
-use crate::EmbeddingsRequestBuilder;
-use crate::RerankRequestBuilder;
 
 #[derive(Clone, Debug)]
 pub struct VoyageAiClient {
@@ -28,11 +26,8 @@ impl Default for VoyageAiClient {
     fn default() -> Self {
         let config = VoyageConfig::default();
         Self {
-            api_key: String::new(),
-            client: reqwest::Client::new(),
             embeddings_client: crate::client::embeddings_client::EmbeddingClient::new(config.clone()),
             rerank_client: crate::client::rerank_client::RerankClient::new(String::new()),
-            rate_limiter: RateLimiter::new(std::time::Duration::from_secs(1)),
         }
     }
 }
@@ -80,11 +75,8 @@ impl VoyageBuilder {
         let rerank_client = crate::client::rerank_client::RerankClient::new(api_key.clone());
 
         Ok(VoyageAiClient {
-            api_key,
-            client,
             embeddings_client,
             rerank_client,
-            rate_limiter,
         })
     }
 }

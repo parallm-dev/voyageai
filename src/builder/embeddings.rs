@@ -98,7 +98,6 @@ impl EmbeddingsRequestBuilder {
 
         Ok(EmbeddingsRequest {
             input: match input {
-                EmbeddingsInput::Single(s) => vec![s],
                 EmbeddingsInput::Multiple(v) => v,
             },
             model,
