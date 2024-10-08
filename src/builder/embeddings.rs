@@ -60,8 +60,8 @@ impl EmbeddingsRequestBuilder {
         self
     }
 
-    pub fn input_multiple(mut self, input: Vec<String>) -> Self {
-        self.input = Some(EmbeddingsInput::Multiple(input));
+    pub fn input_multiple(mut self, input: impl IntoIterator<Item = impl Into<String>>) -> Self {
+        self.input = Some(EmbeddingsInput::Multiple(input.into_iter().map(Into::into).collect()));
         self
     }
 
