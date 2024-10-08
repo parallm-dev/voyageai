@@ -1,13 +1,12 @@
 pub use crate::errors::VoyageError;
 pub use crate::models::EmbeddingData;
-pub use crate::models::EmbeddingModel;
-pub use crate::models::EmbeddingsResult;
-
-pub use crate::config::VoyageConfig;
-pub use crate::errors::VoyageBuilderError;
-
+use async_trait::async_trait;
 use reqwest::Client;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
+use crate::builder::EmbeddingsRequest;
+use crate::config::VoyageConfig;
+use crate::errors::VoyageError;
+use crate::models::EmbeddingModel;
 
 pub const BASE_URL: &str = "https://api.voyageai.com/v1";
 
@@ -25,13 +24,6 @@ pub struct Usage {
 }
 
 #[derive(Debug, Clone)]
-pub struct EmbeddingClient {
-    client: Client,
-    config: VoyageConfig,
-}
-
-pub type EmbeddingsClient = EmbeddingClient;
-
 pub struct EmbeddingClient {
     client: Client,
     config: VoyageConfig,
@@ -63,12 +55,6 @@ impl EmbeddingClient {
             Err(VoyageError::ApiError(response.text().await?))
         }
     }
-    pub fn new(config: VoyageConfig) -> Self {
-        Self {
-            client: Client::new(),
-            config,
-        }
-    }
 
     pub fn input(&self, input: impl Into<String>) -> crate::builder::EmbeddingsRequestBuilder {
         let input_string: String = input.into();
@@ -78,28 +64,11 @@ impl EmbeddingClient {
     pub fn input_multiple(&self, input: Vec<String>) -> crate::builder::EmbeddingsRequestBuilder {
         crate::builder::EmbeddingsRequestBuilder::new().input(input)
     }
-
-impl EmbeddingClient {
-    pub async fn create_embedding(
-        &self,
-        request: &EmbeddingsRequest,
-    ) -> Result<EmbeddingsResponse, VoyageError> {
-        let url = format!("{}/embeddings", BASE_URL);
-
-        let response = self
-            .client
-            .post(&url)
-            .bearer_auth(&self.config.api_key)
-            .json(&request)
-            .send()
-            .await?;
-
-        if response.status().is_success() {
-            let embeddings_response = response.json::<EmbeddingsResponse>().await?;
-            Ok(embeddings_response)
-        } else {
-            Err(VoyageError::ApiError(response.text().await?))
-        }
-    }
 }
+
+#[derive(Debug, Deserialize)]
+pub struct EmbeddingData {
+    pub object: String,
+    pub embedding: Vec<f32>,
+    pub index: usize,
 }
