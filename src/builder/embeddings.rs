@@ -55,8 +55,8 @@ impl EmbeddingsRequestBuilder {
         Default::default()
     }
 
-    pub fn input(mut self, input: Vec<String>) -> Self {
-        self.input = Some(EmbeddingsInput::Multiple(input));
+    pub fn input(mut self, input: impl Into<String>) -> Self {
+        self.input = Some(EmbeddingsInput::Single(input.into()));
         self
     }
 
@@ -90,13 +90,18 @@ impl EmbeddingsRequestBuilder {
         let model = self.model.ok_or(EmbeddingsBuilderError::MissingModel)?;
         let _voyage = self.voyage.ok_or(EmbeddingsBuilderError::MissingVoyage)?;
 
-        let EmbeddingsInput::Multiple(ref texts) = input;
-        if texts.len() > 128 {
-            return Err(EmbeddingsBuilderError::InputListTooLong);
+        match &input {
+            EmbeddingsInput::Single(_) => {},
+            EmbeddingsInput::Multiple(texts) => {
+                if texts.len() > 128 {
+                    return Err(EmbeddingsBuilderError::InputListTooLong);
+                }
+            }
         }
 
         Ok(EmbeddingsRequest {
             input: match input {
+                EmbeddingsInput::Single(s) => vec![s],
                 EmbeddingsInput::Multiple(v) => v,
             },
             model,
@@ -114,6 +119,7 @@ pub enum InputType {
 
 #[derive(Debug)]
 pub enum EmbeddingsInput {
+    Single(String),
     Multiple(Vec<String>),
 }
 
