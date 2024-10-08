@@ -17,12 +17,12 @@ impl VoyageAiClient {
         VoyageBuilder::new()
     }
 
-    pub fn embeddings(&self) -> EmbeddingsRequestBuilder {
-        EmbeddingsRequestBuilder::new()
+    pub fn embeddings(&self) -> &crate::client::embeddings_client::EmbeddingsClient {
+        &self.embeddings_client
     }
 
-    pub fn rerank(&self) -> RerankClient {
-        RerankClient::new(self.api_key.clone())
+    pub fn rerank(&self) -> &crate::client::rerank_client::RerankClient {
+        &self.rerank_client
     }
 }
 
@@ -75,9 +75,14 @@ impl VoyageBuilder {
 
         let rate_limiter = RateLimiter::new(config.rate_limit_duration);
 
+        let embeddings_client = crate::client::embeddings_client::EmbeddingClient::new(config.clone());
+        let rerank_client = crate::client::rerank_client::RerankClient::new(api_key.clone());
+
         Ok(VoyageAiClient {
             api_key,
             client,
+            embeddings_client,
+            rerank_client,
             rate_limiter,
         })
     }
