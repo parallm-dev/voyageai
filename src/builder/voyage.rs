@@ -29,9 +29,12 @@ impl VoyageAiClient {
 
 impl Default for VoyageAiClient {
     fn default() -> Self {
+        let config = VoyageConfig::default();
         Self {
             api_key: String::new(),
             client: reqwest::Client::new(),
+            embeddings_client: crate::client::embeddings_client::EmbeddingClient::new(config.clone()),
+            rerank_client: crate::client::rerank_client::RerankClient::new(String::new()),
             rate_limiter: RateLimiter::new(std::time::Duration::from_secs(1)),
         }
     }
@@ -98,8 +101,7 @@ pub fn rerank() -> crate::client::rerank_client::RerankClientBuilder {
 }
 
 pub fn rerank_request_builder() -> RerankRequestBuilder {
-    let client = VoyageAiClient::builder().build().unwrap();
-    RerankRequestBuilder::new(client)
+    RerankRequestBuilder::new()
 }
 
 pub use crate::builder::embeddings::EmbeddingsRequest;

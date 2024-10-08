@@ -153,7 +153,7 @@ pub async fn llm(
     // Placeholder implementation
     let embeddings_request = client
         .embeddings()
-        .input(vec![prompt.to_string()])
+        .create_embedding(vec![prompt.to_string()])
         .model(options.model)
         .build()
         .map_err(|e| VoyageError::InvalidRequest {
