@@ -1,4 +1,4 @@
-use voyageai::{VoyageAiClient, RerankModel, RerankRequestBuilder};
+use voyageai::{VoyageAiClient, RerankModel};
 
 #[tokio::test]
 async fn test_rerank() {
@@ -15,7 +15,7 @@ async fn test_rerank() {
         .build()
         .expect("Failed to build rerank request");
 
-    let response = rerank_request.send(&client).await;
+    let response = client.rerank().rerank(&rerank_request).await;
     assert!(response.is_ok());
     let rerank_response = response.unwrap();
     assert_eq!(rerank_response.results.len(), 3);

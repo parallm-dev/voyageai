@@ -28,7 +28,7 @@ async fn test_embeddings_similarity() {
             .build()
             .expect("Failed to build embeddings request");
 
-        request.send(&client).await
+        client.embeddings().create_embedding(&request).await
             .expect("Failed to create embedding")
             .data[0]
             .embedding
