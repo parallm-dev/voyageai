@@ -55,8 +55,8 @@ impl EmbeddingsRequestBuilder {
         Default::default()
     }
 
-    pub fn input(mut self, input: impl Into<String>) -> Self {
-        self.input = Some(EmbeddingsInput::Single(input.into()));
+    pub fn input<T: Into<EmbeddingsInput>>(mut self, input: T) -> Self {
+        self.input = Some(input.into());
         self
     }
 
@@ -130,6 +130,18 @@ pub enum InputType {
 pub enum EmbeddingsInput {
     Single(String),
     Multiple(Vec<String>),
+}
+
+impl From<String> for EmbeddingsInput {
+    fn from(s: String) -> Self {
+        EmbeddingsInput::Single(s)
+    }
+}
+
+impl From<Vec<String>> for EmbeddingsInput {
+    fn from(v: Vec<String>) -> Self {
+        EmbeddingsInput::Multiple(v)
+    }
 }
 
 #[derive(Debug, Serialize)]
