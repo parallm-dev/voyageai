@@ -1,4 +1,5 @@
 use voyageai::{VoyageAiClient, models::EmbeddingModel};
+use voyageai::builder::embeddings::EmbeddingsRequestBuilder;
 
 #[tokio::test]
 async fn test_embeddings_with_multiple_inputs() {
@@ -8,8 +9,7 @@ async fn test_embeddings_with_multiple_inputs() {
         .expect("Failed to build embeddings client");
 
     let inputs = vec!["first input".to_string(), "second input".to_string(), "third input".to_string()];
-    let embeddings_request = client
-        .embeddings()
+    let embeddings_request = EmbeddingsRequestBuilder::new()
         .input_multiple(inputs.clone())
         .model(EmbeddingModel::Voyage3)
         .with_client(&client)
