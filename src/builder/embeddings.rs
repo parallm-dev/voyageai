@@ -60,6 +60,11 @@ impl EmbeddingsRequestBuilder {
         self
     }
 
+    pub fn input_multiple(mut self, input: Vec<String>) -> Self {
+        self.input = Some(EmbeddingsInput::Multiple(input));
+        self
+    }
+
     pub fn model(mut self, model: EmbeddingModel) -> Self {
         self.model = Some(model);
         self
