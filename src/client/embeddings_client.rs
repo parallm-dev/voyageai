@@ -49,8 +49,6 @@ impl EmbeddingClient {
         crate::builder::EmbeddingsRequestBuilder::new().input(input)
     }
 
-use crate::builder::EmbeddingsRequest;
-
 impl EmbeddingClient {
     pub async fn create_embedding(
         &self,

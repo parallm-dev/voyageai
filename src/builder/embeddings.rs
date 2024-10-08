@@ -129,7 +129,6 @@ pub struct EmbeddingsRequest {
 }
 
 use crate::VoyageError;
-use crate::client::embeddings_client::EmbeddingsResponse;
 
 impl EmbeddingsRequest {
     pub async fn send(self) -> Result<EmbeddingsResponse, VoyageError> {
