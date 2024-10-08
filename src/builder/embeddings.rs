@@ -38,11 +38,10 @@ pub struct Usage {
 use crate::errors::VoyageBuilderError as EmbeddingsBuilderError;
 use crate::models::EmbeddingModel;
 use crate::VoyageAiClient;
-use std::borrow::Cow;
 
 #[derive(Debug, Default)]
-pub struct EmbeddingsRequestBuilder<'a> {
-    input: Option<EmbeddingsInput<'a>>,
+pub struct EmbeddingsRequestBuilder {
+    input: Option<EmbeddingsInput>,
     model: Option<EmbeddingModel>,
     input_type: Option<InputType>,
     voyage: Option<VoyageAiClient>,
@@ -50,12 +49,12 @@ pub struct EmbeddingsRequestBuilder<'a> {
     encoding_format: Option<EncodingFormat>,
 }
 
-impl<'a> EmbeddingsRequestBuilder<'a> {
+impl EmbeddingsRequestBuilder {
     pub fn new() -> Self {
         Default::default()
     }
 
-    pub fn input<T: Into<EmbeddingsInput<'a>>>(mut self, input: T) -> Self {
+    pub fn input<T: Into<EmbeddingsInput>>(mut self, input: T) -> Self {
         self.input = Some(input.into());
         self
     }
@@ -85,7 +84,7 @@ impl<'a> EmbeddingsRequestBuilder<'a> {
         self
     }
 
-    pub fn build(self) -> Result<EmbeddingsRequest<'a>, EmbeddingsBuilderError> {
+    pub fn build(self) -> Result<EmbeddingsRequest, EmbeddingsBuilderError> {
         let input = self.input.ok_or(EmbeddingsBuilderError::MissingInput)?;
         let model = self.model.ok_or(EmbeddingsBuilderError::MissingModel)?;
         let voyage = self.voyage.ok_or(EmbeddingsBuilderError::MissingVoyage)?;
@@ -114,14 +113,14 @@ pub enum InputType {
 }
 
 #[derive(Debug)]
-pub enum EmbeddingsInput<'a> {
-    Single(Cow<'a, str>),
-    Multiple(Vec<Cow<'a, str>>),
+pub enum EmbeddingsInput {
+    Single(String),
+    Multiple(Vec<String>),
 }
 
 #[derive(Debug)]
-pub struct EmbeddingsRequest<'a> {
-    pub input: EmbeddingsInput<'a>,
+pub struct EmbeddingsRequest {
+    pub input: EmbeddingsInput,
     pub model: EmbeddingModel,
     pub input_type: Option<InputType>,
     pub voyage: VoyageAiClient,
