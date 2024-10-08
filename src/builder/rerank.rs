@@ -15,9 +15,9 @@ pub struct RerankRequestBuilder {
 }
 
 impl RerankRequestBuilder {
-    pub fn new(voyage: &VoyageAiClient) -> Self {
+    pub fn new(voyage: VoyageAiClient) -> Self {
         Self {
-            voyage: Some(voyage.clone()),
+            voyage: Some(voyage),
             ..Default::default()
         }
     }
