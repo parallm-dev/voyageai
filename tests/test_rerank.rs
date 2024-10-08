@@ -1,4 +1,4 @@
-use voyageai::{VoyageAiClient, RerankModel};
+use voyageai::{VoyageAiClient, RerankModel, RerankRequestBuilder};
 
 #[tokio::test]
 async fn test_rerank() {
@@ -7,7 +7,7 @@ async fn test_rerank() {
         .build()
         .expect("Failed to build rerank client");
 
-    let rerank_request = crate::builder::RerankRequestBuilder::new()
+    let rerank_request = RerankRequestBuilder::new()
         .query("test query")
         .documents(["doc1", "doc2", "doc3"])
         .model(RerankModel::V2)
