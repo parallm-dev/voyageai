@@ -4,18 +4,18 @@ use crate::models::RerankModel;
 use serde::Serialize;
 
 #[derive(Debug, Default)]
-pub struct RerankRequestBuilder<'a> {
+pub struct RerankRequestBuilder {
     query: Option<String>,
     documents: Option<Vec<String>>,
     model: Option<RerankModel>,
     top_n: Option<usize>,
     truncate: Option<bool>,
     include_metadata: Option<bool>,
-    voyage: Option<&'a VoyageAiClient>,
+    voyage: Option<VoyageAiClient>,
 }
 
-impl<'a> RerankRequestBuilder<'a> {
-    pub fn new(voyage: &'a VoyageAiClient) -> Self {
+impl RerankRequestBuilder {
+    pub fn new(voyage: VoyageAiClient) -> Self {
         Self {
             voyage: Some(voyage),
             ..Default::default()
@@ -52,7 +52,7 @@ impl<'a> RerankRequestBuilder<'a> {
         self
     }
 
-    pub fn build(self) -> Result<RerankRequest<'a>, VoyageBuilderError> {
+    pub fn build(self) -> Result<RerankRequest, VoyageBuilderError> {
         let query = self
             .query
             .ok_or(VoyageBuilderError::MissingField("query".to_string()))?;
@@ -75,7 +75,7 @@ impl<'a> RerankRequestBuilder<'a> {
 }
 
 #[derive(Debug, Serialize, Clone)]
-pub struct RerankRequest<'a> {
+pub struct RerankRequest {
     pub query: String,
     pub documents: Vec<String>,
     pub model: RerankModel,
@@ -84,23 +84,23 @@ pub struct RerankRequest<'a> {
     pub truncate: bool,
     pub include_metadata: bool,
     #[serde(skip)]
-    pub voyage: &'a VoyageAiClient,
+    pub voyage: VoyageAiClient,
 }
 
-impl<'a> RerankRequest<'a> {
-    pub fn share(&self) -> RerankRequest<'a> {
+impl RerankRequest {
+    pub fn share(&self) -> RerankRequest {
         RerankRequest {
             query: self.query.clone(),
             documents: self.documents.clone(),
-            model: self.model.clone(),
+            model: self.model,
             top_n: self.top_n,
             truncate: self.truncate,
             include_metadata: self.include_metadata,
-            voyage: self.voyage,
+            voyage: self.voyage.clone(),
         }
     }
 
-    pub fn request(&self) -> &RerankRequest<'a> {
+    pub fn request(&self) -> &RerankRequest {
         self
     }
 }

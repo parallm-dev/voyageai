@@ -155,7 +155,6 @@ pub async fn llm(
         .embeddings()
         .input(prompt.to_string())
         .model(options.model)
-        .voyage(client.clone())
         .build()
         .map_err(|e| VoyageError::InvalidRequest {
             message: e.to_string(),
