@@ -1,7 +1,5 @@
-use super::*;
-use std::env;
-use voyageai::models::EmbeddingModel;
-use voyageai::{EmbeddingsRequestBuilder, EmbeddingsResponse, VoyageAiClient};
+use voyageai::{VoyageAiClient, EmbeddingModel};
+use voyageai::client::embeddings_client::EmbeddingsResponse;
 
 #[cfg(test)]
 mod tests {
