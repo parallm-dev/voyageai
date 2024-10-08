@@ -45,7 +45,7 @@ pub struct EmbeddingsRequestBuilder {
     input: Option<EmbeddingsInput>,
     model: Option<EmbeddingModel>,
     input_type: Option<InputType>,
-    voyage: Option<VoyageAiClient>,
+    voyage: Option<crate::client::voyage_client::VoyageAiClient>,
     truncation: Option<bool>,
     encoding_format: Option<EncodingFormat>,
 }
@@ -68,7 +68,7 @@ impl EmbeddingsRequestBuilder {
         Self::default()
     }
 
-    pub fn with_client(mut self, voyage: &crate::builder::voyage::VoyageAiClient) -> Self {
+    pub fn with_client(mut self, voyage: &crate::client::voyage_client::VoyageAiClient) -> Self {
         self.voyage = Some(voyage.clone());
         self
     }
