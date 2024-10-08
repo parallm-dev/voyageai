@@ -127,3 +127,9 @@ pub struct EmbeddingsRequest {
     pub truncation: Option<bool>,
     pub encoding_format: Option<EncodingFormat>,
 }
+
+impl EmbeddingsRequest {
+    pub async fn send(self) -> Result<EmbeddingsResponse, VoyageError> {
+        self.voyage.embeddings().create_embedding(&self).await
+    }
+}

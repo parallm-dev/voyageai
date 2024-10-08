@@ -51,7 +51,7 @@ impl EmbeddingClient {
 
     pub async fn create_embedding(
         &self,
-        result: &EmbeddingsResult,
+        request: &EmbeddingsRequest,
     ) -> Result<EmbeddingsResponse, VoyageError> {
         let url = format!("{}/embeddings", BASE_URL);
 
@@ -59,7 +59,7 @@ impl EmbeddingClient {
             .client
             .post(&url)
             .bearer_auth(&self.config.api_key)
-            .json(&result.data)
+            .json(&request)
             .send()
             .await?;
 
