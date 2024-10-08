@@ -88,7 +88,7 @@ impl RerankClientBuilder {
 
     pub fn build(self) -> Result<RerankClient, VoyageError> {
         let api_key = self.api_key.ok_or(VoyageError::MissingApiKey)?;
-        let client = self.client.unwrap_or_else(Client::new);
+        let client = self.client.unwrap_or_default();
 
         Ok(RerankClient { client, api_key })
     }

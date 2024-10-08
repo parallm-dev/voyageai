@@ -30,8 +30,8 @@ pub struct GenerateOptionsBuilder {
     user: Option<String>,
 }
 
-impl GenerateOptionsBuilder {
-    pub fn new() -> Self {
+impl Default for GenerateOptionsBuilder {
+    fn default() -> Self {
         Self {
             model: None,
             max_tokens: None,
@@ -44,6 +44,12 @@ impl GenerateOptionsBuilder {
             logit_bias: None,
             user: None,
         }
+    }
+}
+
+impl GenerateOptionsBuilder {
+    pub fn new() -> Self {
+        Default::default()
     }
 
     pub fn model(mut self, model: EmbeddingModel) -> Self {

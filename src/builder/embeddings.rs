@@ -90,9 +90,7 @@ impl EmbeddingsRequestBuilder {
         let model = self.model.ok_or(EmbeddingsBuilderError::MissingModel)?;
         let _voyage = self.voyage.ok_or(EmbeddingsBuilderError::MissingVoyage)?;
 
-        let texts = match input {
-            EmbeddingsInput::Multiple(ref texts) => texts,
-        };
+        let EmbeddingsInput::Multiple(ref texts) = input;
         if texts.len() > 128 {
             return Err(EmbeddingsBuilderError::InputListTooLong);
         }

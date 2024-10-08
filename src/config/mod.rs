@@ -1,3 +1,3 @@
-mod config;
+mod voyage_config;
 
-pub use config::VoyageConfig;
+pub use voyage_config::VoyageConfig;

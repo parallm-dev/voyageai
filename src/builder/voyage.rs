@@ -67,7 +67,7 @@ impl VoyageBuilder {
             .ok_or(VoyageBuilderError::ApiKeyNotSet)?;
 
         let _client = self.client.unwrap_or_default();
-        let config = self.config.unwrap_or_else(VoyageConfig::default);
+        let config = self.config.unwrap_or_default();
 
         let _rate_limiter = RateLimiter::new(config.rate_limit_duration);
 
