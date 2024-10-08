@@ -29,3 +29,5 @@ default = []
 [lib]
 name = "voyageai"
 path = "src/lib.rs"
+[dev-dependencies]
+approx = "0.5.1"
