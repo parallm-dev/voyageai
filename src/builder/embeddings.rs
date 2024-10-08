@@ -50,8 +50,8 @@ pub struct EmbeddingsRequestBuilder {
     encoding_format: Option<EncodingFormat>,
 }
 
-impl EmbeddingsRequestBuilder {
-    pub fn new() -> Self {
+impl Default for EmbeddingsRequestBuilder {
+    fn default() -> Self {
         Self {
             input: None,
             model: None,
@@ -60,6 +60,12 @@ impl EmbeddingsRequestBuilder {
             truncation: None,
             encoding_format: None,
         }
+    }
+}
+
+impl EmbeddingsRequestBuilder {
+    pub fn new() -> Self {
+        Self::default()
     }
 
     pub fn with_client(mut self, voyage: &VoyageAiClient) -> Self {
