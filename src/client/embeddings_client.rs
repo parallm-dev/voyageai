@@ -66,10 +66,6 @@ impl EmbeddingClient {
     pub fn input_multiple(&self, input: impl IntoIterator<Item = impl Into<String>>) -> crate::builder::EmbeddingsRequestBuilder {
         crate::builder::EmbeddingsRequestBuilder::new().input_multiple(input)
     }
-
-    pub fn input_multiple(&self, input: Vec<String>) -> crate::builder::EmbeddingsRequestBuilder {
-        crate::builder::EmbeddingsRequestBuilder::new().input(input)
-    }
 }
 
 #[derive(Debug, Deserialize)]

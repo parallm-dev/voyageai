@@ -60,7 +60,11 @@ impl EmbeddingsRequestBuilder {
         self
     }
 
-    pub fn input_multiple(mut self, input: impl IntoIterator<Item = impl Into<String>>) -> Self {
+    pub fn input_multiple<I, S>(mut self, input: I) -> Self
+    where
+        I: IntoIterator<Item = S>,
+        S: Into<String>,
+    {
         self.input = Some(EmbeddingsInput::Multiple(input.into_iter().map(Into::into).collect()));
         self
     }
