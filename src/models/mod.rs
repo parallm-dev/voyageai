@@ -1,4 +1,4 @@
-mod embeddings;
+pub mod embeddings;
 mod rerank;
 
 pub use embeddings::*;
