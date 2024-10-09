@@ -5,11 +5,11 @@ async fn test_rerank() {
     let client = VoyageAiClient::builder()
         .api_key("test_api_key")
         .build()
-        .expect("Failed to build rerank client");
+        .expect("Failed to build VoyageAiClient");
 
     let rerank_request = RerankRequestBuilder::new()
         .query("test query")
-        .documents(["doc1", "doc2", "doc3"])
+        .documents(vec!["doc1", "doc2", "doc3"])
         .model(RerankModel::V2)
         .build()
         .expect("Failed to build rerank request");
