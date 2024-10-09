@@ -68,7 +68,7 @@ impl EmbeddingsRequestBuilder {
         Self::default()
     }
 
-    pub fn with_client(mut self, voyage: &crate::client::voyage_client::VoyageAiClient) -> Self {
+    pub fn with_client(mut self, voyage: &VoyageAiClient) -> Self {
         self.voyage = Some(voyage.clone());
         self
     }
