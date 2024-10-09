@@ -1,5 +1,5 @@
-use crate::models::EmbeddingModel;
 use crate::builder::EmbeddingsRequest;
+use crate::models::EmbeddingModel;
 use crate::VoyageAiClient;
 use crate::VoyageError;
 use std::collections::HashMap;

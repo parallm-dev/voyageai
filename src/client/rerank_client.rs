@@ -43,10 +43,7 @@ impl RerankClient {
         RerankClientBuilder::default()
     }
 
-    pub async fn rerank(
-        &self,
-        request: RerankRequest,
-    ) -> Result<RerankResponse, VoyageError> {
+    pub async fn rerank(&self, request: RerankRequest) -> Result<RerankResponse, VoyageError> {
         let url = format!("{}/rerank", BASE_URL);
 
         let response = self

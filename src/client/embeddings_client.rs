@@ -1,9 +1,9 @@
-use reqwest::Client;
-use serde::Deserialize;
 use crate::builder::EmbeddingsRequest;
 use crate::config::VoyageConfig;
 use crate::errors::VoyageError;
 use crate::models::EmbeddingModel;
+use reqwest::Client;
+use serde::Deserialize;
 
 pub const BASE_URL: &str = "https://api.voyageai.com/v1";
 
@@ -40,7 +40,10 @@ impl EmbeddingClient {
         }
     }
 
-    pub async fn create_embedding(&self, request: &EmbeddingsRequest) -> Result<EmbeddingsResponse, VoyageError> {
+    pub async fn create_embedding(
+        &self,
+        request: &EmbeddingsRequest,
+    ) -> Result<EmbeddingsResponse, VoyageError> {
         let url = format!("{}/embeddings", BASE_URL);
 
         let response = self

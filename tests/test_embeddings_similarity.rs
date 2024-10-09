@@ -1,5 +1,5 @@
-use voyageai::{VoyageAiClient, EmbeddingModel};
 use approx::assert_relative_eq;
+use voyageai::{EmbeddingModel, VoyageAiClient};
 
 fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
     let dot_product: f32 = a.iter().zip(b.iter()).map(|(x, y)| x * y).sum();
@@ -30,7 +30,10 @@ async fn test_embeddings_similarity() {
                 .build()
                 .expect("Failed to build embeddings request");
 
-            client.embeddings().create_embedding(&request).await
+            client
+                .embeddings()
+                .create_embedding(&request)
+                .await
                 .expect("Failed to create embedding")
                 .data[0]
                 .embedding
@@ -44,7 +47,8 @@ async fn test_embeddings_similarity() {
 
     // Calculate similarities
     let similarity_to_similar = cosine_similarity(&document_embedding, &similar_query_embedding);
-    let similarity_to_dissimilar = cosine_similarity(&document_embedding, &dissimilar_query_embedding);
+    let similarity_to_dissimilar =
+        cosine_similarity(&document_embedding, &dissimilar_query_embedding);
 
     // Assert that the similar query has a higher similarity score
     assert!(
@@ -58,5 +62,9 @@ async fn test_embeddings_similarity() {
     assert_relative_eq!(similarity_to_similar, 1.0, epsilon = 0.3);
 
     // Assert that the dissimilar query has a relatively low similarity (adjust threshold as needed)
-    assert!(similarity_to_dissimilar < 0.5, "Dissimilar query similarity too high: {}", similarity_to_dissimilar);
+    assert!(
+        similarity_to_dissimilar < 0.5,
+        "Dissimilar query similarity too high: {}",
+        similarity_to_dissimilar
+    );
 }

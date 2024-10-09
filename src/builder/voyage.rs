@@ -34,7 +34,9 @@ impl Default for VoyageAiClient {
     fn default() -> Self {
         let config = VoyageConfig::default();
         Self {
-            embeddings_client: crate::client::embeddings_client::EmbeddingClient::new(config.clone()),
+            embeddings_client: crate::client::embeddings_client::EmbeddingClient::new(
+                config.clone(),
+            ),
             rerank_client: crate::client::rerank_client::RerankClient::new(String::new()),
         }
     }
@@ -79,7 +81,8 @@ impl VoyageBuilder {
 
         let _rate_limiter = RateLimiter::new(config.rate_limit_duration);
 
-        let embeddings_client = crate::client::embeddings_client::EmbeddingClient::new(config.clone());
+        let embeddings_client =
+            crate::client::embeddings_client::EmbeddingClient::new(config.clone());
         let rerank_client = crate::client::rerank_client::RerankClient::new(api_key.clone());
 
         Ok(VoyageAiClient {

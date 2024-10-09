@@ -1,8 +1,8 @@
-use serde::{Deserialize, Serialize};
 use crate::errors::VoyageBuilderError as EmbeddingsBuilderError;
 use crate::models::EmbeddingModel;
 use crate::VoyageAiClient;
 use crate::VoyageError;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Object {
@@ -83,7 +83,9 @@ impl<C> EmbeddingsRequestBuilder<C> {
         I: IntoIterator<Item = S>,
         S: Into<String>,
     {
-        self.input = Some(EmbeddingsInput::Multiple(input.into_iter().map(Into::into).collect()));
+        self.input = Some(EmbeddingsInput::Multiple(
+            input.into_iter().map(Into::into).collect(),
+        ));
         self
     }
 
@@ -117,7 +119,7 @@ impl<C> EmbeddingsRequestBuilder<C> {
         let model = self.model.ok_or(EmbeddingsBuilderError::MissingModel)?;
 
         match &input {
-            EmbeddingsInput::Single(_) => {},
+            EmbeddingsInput::Single(_) => {}
             EmbeddingsInput::Multiple(texts) => {
                 if texts.len() > 128 {
                     return Err(EmbeddingsBuilderError::InputListTooLong);
@@ -172,7 +174,10 @@ pub struct EmbeddingsRequest {
 }
 
 impl EmbeddingsRequest {
-    pub async fn send(self, client: &VoyageAiClient) -> Result<crate::client::embeddings_client::EmbeddingsResponse, VoyageError> {
+    pub async fn send(
+        self,
+        client: &VoyageAiClient,
+    ) -> Result<crate::client::embeddings_client::EmbeddingsResponse, VoyageError> {
         client.embeddings().create_embedding(&self).await
     }
 }

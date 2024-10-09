@@ -1,5 +1,5 @@
+use voyageai::builder::{EmbeddingsRequestBuilder, VoyageBuilder};
 use voyageai::{EmbeddingModel, VoyageAiClient};
-use voyageai::builder::{VoyageBuilder, EmbeddingsRequestBuilder};
 
 #[cfg(test)]
 mod tests {
@@ -18,7 +18,10 @@ mod tests {
             .build()
             .expect("Failed to build embeddings request");
 
-        let response = client.embeddings().create_embedding(&embeddings_request).await;
+        let response = client
+            .embeddings()
+            .create_embedding(&embeddings_request)
+            .await;
         assert!(response.is_ok());
         let embeddings_response = response.unwrap();
         assert_eq!(embeddings_response.data.len(), 1);
@@ -38,7 +41,10 @@ mod tests {
             .build()
             .expect("Failed to build embeddings request");
 
-        let response = client.embeddings().create_embedding(&embeddings_request).await;
+        let response = client
+            .embeddings()
+            .create_embedding(&embeddings_request)
+            .await;
         assert!(response.is_err());
     }
 

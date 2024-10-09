@@ -1,4 +1,4 @@
-use voyageai::{VoyageAiClient, RerankModel, RerankRequestBuilder};
+use voyageai::{RerankModel, RerankRequestBuilder, VoyageAiClient};
 
 #[tokio::test]
 async fn test_rerank() {
