@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use crate::errors::VoyageBuilderError as EmbeddingsBuilderError;
 use crate::models::EmbeddingModel;
-use crate::client::voyage_client::VoyageAiClient;
+use crate::VoyageAiClient;
 use crate::VoyageError;
 
 #[derive(Debug, Serialize, Deserialize)]

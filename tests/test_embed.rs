@@ -1,4 +1,4 @@
-use voyageai::{models::EmbeddingModel, client::voyage_client::VoyageAiClient};
+use voyageai::{models::EmbeddingModel, VoyageAiClient};
 use voyageai::builder::embeddings::EmbeddingsRequestBuilder;
 
 #[tokio::test]
