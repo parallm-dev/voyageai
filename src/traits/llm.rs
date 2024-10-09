@@ -143,7 +143,7 @@ pub struct LogProbs {
 pub async fn llm(
     client: &VoyageAiClient,
     prompt: &str,
-    options: &GenerateOptions,
+    options: GenerateOptions,
 ) -> Result<GenerateResponse, VoyageError> {
     // Implement the API call to generate response
     // Placeholder implementation

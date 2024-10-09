@@ -45,7 +45,7 @@ impl RerankClient {
 
     pub async fn rerank(
         &self,
-        request: &RerankRequest,
+        request: RerankRequest,
     ) -> Result<RerankResponse, VoyageError> {
         let url = format!("{}/rerank", BASE_URL);
 
@@ -53,7 +53,7 @@ impl RerankClient {
             .client
             .post(&url)
             .bearer_auth(&self.api_key)
-            .json(request)
+            .json(&request)
             .send()
             .await?;
 
