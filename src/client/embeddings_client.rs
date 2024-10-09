@@ -62,16 +62,22 @@ impl EmbeddingClient {
         }
     }
 
-    pub fn input<T: Into<String>>(&self, input: T) -> crate::builder::EmbeddingsRequestBuilder {
-        crate::builder::EmbeddingsRequestBuilder::new().input(input)
+    pub fn input<T: Into<String>>(
+        &self,
+        input: T,
+    ) -> crate::builder::EmbeddingsRequestBuilder<VoyageConfig> {
+        crate::builder::EmbeddingsRequestBuilder::<VoyageConfig>::new().input(input)
     }
 
-    pub fn input_multiple<I, T>(&self, input: I) -> crate::builder::EmbeddingsRequestBuilder
+    pub fn input_multiple<I, T>(
+        &self,
+        input: I,
+    ) -> crate::builder::EmbeddingsRequestBuilder<VoyageConfig>
     where
         I: IntoIterator<Item = T>,
         T: Into<String>,
     {
-        crate::builder::EmbeddingsRequestBuilder::new().input_multiple(input)
+        crate::builder::EmbeddingsRequestBuilder::<VoyageConfig>::new().input_multiple(input)
     }
 }
 
