@@ -4,8 +4,8 @@ mod tests {
     use std::error::Error;
     use std::result::Result;
     use voyageai::builder::embeddings::EmbeddingsRequestBuilder;
-    use voyageai::builder::voyage::VoyageAiClient;
     use voyageai::models::EmbeddingModel;
+    use voyageai::VoyageAiClient;
 
     #[tokio::test]
     async fn test_client() {
@@ -25,7 +25,7 @@ mod tests {
             .build()
             .expect("Failed to build embeddings request");
 
-        let response = embeddings_request.send(&client).await?;
+        let response = embeddings_request.send(client).await?;
         let embeddings_response = response;
         assert_eq!(
             embeddings_response.data.len(),

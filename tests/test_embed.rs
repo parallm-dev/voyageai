@@ -15,14 +15,13 @@ async fn test_embeddings_with_multiple_inputs() {
     let embeddings_request = voyageai::EmbeddingsRequestBuilder::new()
         .input_multiple(inputs.clone())
         .model(voyageai::EmbeddingModel::Voyage3)
-        .with_client(client.clone())
         .build()
         .expect("Failed to build embeddings request");
 
     let response = client
         .embeddings()
         .create_embedding(&embeddings_request)
-        .await;
-    let embeddings_response = response.unwrap();
-    assert_eq!(embeddings_response.data.len(), inputs.len());
+        .await
+        .expect("Failed to create embedding");
+    assert_eq!(response.data.len(), inputs.len());
 }

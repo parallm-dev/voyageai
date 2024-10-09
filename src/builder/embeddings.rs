@@ -41,36 +41,27 @@ pub struct Usage {
 }
 
 #[derive(Debug)]
-pub struct EmbeddingsRequestBuilder<C> {
+pub struct EmbeddingsRequestBuilder {
     input: Option<EmbeddingsInput>,
     model: Option<EmbeddingModel>,
     input_type: Option<InputType>,
-    voyage: Option<C>,
     truncation: Option<bool>,
     encoding_format: Option<EncodingFormat>,
 }
-
-impl<C> Default for EmbeddingsRequestBuilder<C> {
+impl Default for EmbeddingsRequestBuilder {
     fn default() -> Self {
         Self {
             input: None,
             model: None,
             input_type: None,
-            voyage: None,
             truncation: None,
             encoding_format: None,
         }
     }
 }
-
-impl<C> EmbeddingsRequestBuilder<C> {
+impl EmbeddingsRequestBuilder {
     pub fn new() -> Self {
         Self::default()
-    }
-
-    pub fn with_client(mut self, voyage: C) -> Self {
-        self.voyage = Some(voyage);
-        self
     }
 
     pub fn input<T: Into<EmbeddingsInput>>(mut self, input: T) -> Self {
@@ -96,11 +87,6 @@ impl<C> EmbeddingsRequestBuilder<C> {
 
     pub fn input_type(mut self, input_type: InputType) -> Self {
         self.input_type = Some(input_type);
-        self
-    }
-
-    pub fn voyage<T: Into<C>>(mut self, voyage: T) -> Self {
-        self.voyage = Some(voyage.into());
         self
     }
 
