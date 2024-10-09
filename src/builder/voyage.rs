@@ -70,11 +70,10 @@ impl VoyageBuilder {
     }
 
     pub fn build(self) -> Result<VoyageAiClient, VoyageBuilderError> {
-        let api_key = self
-            .api_key
-            .or_else(|| std::env::var("VOYAGE_API_KEY").ok())
-            .or_else(|| std::env::var("VOYAGEAI_API_KEY").ok())
-            .ok_or(VoyageBuilderError::ApiKeyNotSet)?;
+        let api_key = match self.api_key {
+            Some(key) if !key.is_empty() => key,
+            _ => std::env::var("VOYAGE_API_KEY").map_err(|_| VoyageBuilderError::ApiKeyNotSet)?,
+        };
 
         let _client = self.client.unwrap_or_default();
         let config = self.config.unwrap_or_default();

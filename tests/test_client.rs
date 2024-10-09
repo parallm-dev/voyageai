@@ -11,24 +11,25 @@ mod tests {
     async fn test_client() {
         // Test client implementation
     }
-
     #[tokio::test]
     async fn test_embeddings() -> Result<(), Box<dyn Error>> {
+        let api_key = std::env::var("VOYAGE_API_KEY").expect("VOYAGE_API_KEY must be set");
         let client = VoyageAiClient::builder()
-            .api_key("test_api_key")
+            .api_key(&api_key)
             .build()
-            .expect("Failed to build client");
+            .map_err(|e| format!("Failed to build client: {}", e))?;
 
         let embeddings_request = EmbeddingsRequestBuilder::new()
             .input_multiple(vec!["test input".to_string()])
             .model(EmbeddingModel::Voyage3)
             .build()
-            .expect("Failed to build embeddings request");
+            .map_err(|e| format!("Failed to build embeddings request: {}", e))?;
 
         let response = client
             .embeddings()
             .create_embedding(&embeddings_request)
-            .await?;
+            .await
+            .map_err(|e| format!("Failed to create embedding: {}", e))?;
         let embeddings_response = response;
         assert_eq!(
             embeddings_response.data.len(),

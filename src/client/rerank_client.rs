@@ -13,6 +13,7 @@ pub struct RerankResponse {
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct RerankResult {
+    pub document: String,
     pub index: usize,
     pub relevance_score: f64,
 }
@@ -62,6 +63,7 @@ impl RerankClient {
         }
     }
 }
+
 #[derive(Default)]
 pub struct RerankClientBuilder {
     api_key: Option<String>,
@@ -122,7 +124,11 @@ impl std::fmt::Display for RerankResponse {
 impl RerankResponse {
     pub fn top_results(&self, n: usize) -> Vec<&RerankResult> {
         let mut sorted_results = self.results.iter().collect::<Vec<_>>();
-        sorted_results.sort_by(|a, b| b.relevance_score.partial_cmp(&a.relevance_score).unwrap());
+        sorted_results.sort_by(|a, b| {
+            b.relevance_score
+                .partial_cmp(&a.relevance_score)
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
         sorted_results.truncate(n);
         sorted_results
     }

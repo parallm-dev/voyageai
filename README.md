@@ -3,6 +3,30 @@
 
 This Rust crate provides an unofficial client for interacting with the Voyage AI API. It allows you to easily integrate Voyage AI's powerful language models into your Rust applications.
 
+## API Key Setup
+
+Before using the Voyage AI client, you need to set up your API key. There are two ways to do this:
+
+1. Environment Variable:
+   Set the `VOYAGE_API_KEY` environment variable with your API key:
+
+   ```bash
+   export VOYAGE_API_KEY=your_api_key_here
+   ```
+
+2. Programmatically:
+   You can also set the API key in your code:
+
+   ```rust
+   use voyage_ai_client::VoyageClientBuilder;
+
+   let client = VoyageClientBuilder::new()
+       .api_key("your_api_key_here")
+       .build()?;
+   ```
+
+Make sure to keep your API key secure and never commit it to version control.
+
 ## Features
 
 - Simple and intuitive API
