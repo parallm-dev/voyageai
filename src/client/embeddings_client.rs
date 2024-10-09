@@ -21,6 +21,7 @@ pub struct Usage {
 }
 
 #[derive(Debug, Clone)]
+
 pub struct EmbeddingClient {
     client: Client,
     config: VoyageConfig,

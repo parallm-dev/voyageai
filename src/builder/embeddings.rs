@@ -175,9 +175,9 @@ pub struct EmbeddingsRequest {
 
 impl EmbeddingsRequest {
     pub async fn send(
-        &self,
+        self,
         client: &VoyageAiClient,
     ) -> Result<crate::client::embeddings_client::EmbeddingsResponse, VoyageError> {
-        client.embeddings().create_embedding(self).await
+        client.embeddings().create_embedding(&self).await
     }
 }
