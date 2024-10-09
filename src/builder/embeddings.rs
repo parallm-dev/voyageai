@@ -41,16 +41,16 @@ pub struct Usage {
 }
 
 #[derive(Debug)]
-pub struct EmbeddingsRequestBuilder {
+pub struct EmbeddingsRequestBuilder<C> {
     input: Option<EmbeddingsInput>,
     model: Option<EmbeddingModel>,
     input_type: Option<InputType>,
-    voyage: Option<crate::client::voyage_client::VoyageAiClient>,
+    voyage: Option<C>,
     truncation: Option<bool>,
     encoding_format: Option<EncodingFormat>,
 }
 
-impl Default for EmbeddingsRequestBuilder {
+impl<C> Default for EmbeddingsRequestBuilder<C> {
     fn default() -> Self {
         Self {
             input: None,
@@ -63,12 +63,12 @@ impl Default for EmbeddingsRequestBuilder {
     }
 }
 
-impl EmbeddingsRequestBuilder {
+impl<C> EmbeddingsRequestBuilder<C> {
     pub fn new() -> Self {
         Self::default()
     }
 
-    pub fn with_client(mut self, voyage: VoyageAiClient) -> Self {
+    pub fn with_client(mut self, voyage: C) -> Self {
         self.voyage = Some(voyage);
         self
     }
