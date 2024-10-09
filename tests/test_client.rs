@@ -25,7 +25,10 @@ mod tests {
             .build()
             .expect("Failed to build embeddings request");
 
-        let response = embeddings_request.send(client).await?;
+        let response = client
+            .embeddings()
+            .create_embedding(&embeddings_request)
+            .await?;
         let embeddings_response = response;
         assert_eq!(
             embeddings_response.data.len(),

@@ -41,23 +41,13 @@ pub struct Usage {
 }
 
 #[derive(Debug)]
+#[derive(Default)]
 pub struct EmbeddingsRequestBuilder {
     input: Option<EmbeddingsInput>,
     model: Option<EmbeddingModel>,
     input_type: Option<InputType>,
     truncation: Option<bool>,
     encoding_format: Option<EncodingFormat>,
-}
-impl Default for EmbeddingsRequestBuilder {
-    fn default() -> Self {
-        Self {
-            input: None,
-            model: None,
-            input_type: None,
-            truncation: None,
-            encoding_format: None,
-        }
-    }
 }
 impl EmbeddingsRequestBuilder {
     pub fn new() -> Self {
