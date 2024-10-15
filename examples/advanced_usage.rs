@@ -1,6 +1,6 @@
 use std::env;
 use std::time::Duration;
-use voyageai::builder::embeddings::{EmbeddingsRequestBuilder, InputType};
+use voyageai::builder::embeddings::EmbeddingsRequestBuilder;
 use voyageai::models::embeddings::EmbeddingModel;
 use voyageai::models::rerank::{RerankModel, RerankRequest};
 use voyageai::{VoyageAiClient, VoyageConfig, VoyageError};
@@ -63,8 +63,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let request = EmbeddingsRequestBuilder::new()
                     .input(text.to_string())
                     .model(model)
-                    .input_type(InputType::Document)
-                    .build()?;
+                    .build()
+                    .map_err(|e| VoyageError::BuilderError(e.to_string()))?;
 
                 client.embeddings().create_embedding(&request).await
             },
@@ -116,9 +116,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match rerank_result {
         Ok(response) => {
             println!("Documents reranked. Top results:");
-            for result in response.results.iter().take(2) {
-                println!("- {} (score: {})", result.document, result.relevance_score);
-            }
+            let data = response.data;
+
+            // Now you can process `data` as needed
+            println!("Response data: {:?}", data);
+
             println!("Tokens used: {}", response.usage.total_tokens);
         }
         Err(e) => {
@@ -128,17 +130,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Demonstrate rate limiting
     println!("\nDemonstrating rate limiting...");
+
     for i in 1..=10 {
         let start = std::time::Instant::now();
-        let result = client
-            .embeddings()
-            .create_embedding(
-                &EmbeddingsRequestBuilder::new()
-                    .input(format!("Test input {}", i))
-                    .model(EmbeddingModel::Voyage3)
-                    .build()?,
-            )
-            .await;
+        let request = match EmbeddingsRequestBuilder::new()
+            .input(format!("Test input {}", i))
+            .model(EmbeddingModel::Voyage3)
+            .build()
+        {
+            Ok(req) => req,
+            Err(e) => {
+                eprintln!("Error building request: {:?}", e);
+                continue;
+            }
+        };
+
+        let result = client.embeddings().create_embedding(&request).await;
         let duration = start.elapsed();
 
         match result {

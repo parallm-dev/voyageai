@@ -1,11 +1,52 @@
+use crate::client::VoyageAiClient;
+use crate::VoyageError;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum InputType {
+    #[serde(rename = "query")]
+    Query,
+    #[serde(rename = "document")]
+    Document,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(untagged)]
+pub enum EmbeddingsInput {
+    Single(String),
+    Multiple(Vec<String>),
+}
+
+impl<T: Into<String>> From<T> for EmbeddingsInput {
+    fn from(s: T) -> Self {
+        EmbeddingsInput::Single(s.into())
+    }
+}
+
+impl<T: Into<String>> FromIterator<T> for EmbeddingsInput {
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        EmbeddingsInput::Multiple(iter.into_iter().map(Into::into).collect())
+    }
+}
+
+/// Response structure for embedding requests.
+#[derive(Debug, Deserialize)]
 pub struct EmbeddingsResponse {
+    /// The type of object returned.
     pub object: String,
+    /// A list of embedding data.
     pub data: Vec<EmbeddingData>,
+    /// The model used for generating embeddings.
     pub model: String,
+    /// Usage statistics for the request.
     pub usage: Usage,
+}
+
+/// Usage statistics for an embedding request.
+#[derive(Debug, Deserialize)]
+pub struct Usage {
+    /// The total number of tokens used in the request.
+    pub total_tokens: u32,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -15,9 +56,12 @@ pub struct EmbeddingData {
     pub index: usize,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Usage {
-    pub total_tokens: u32,
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
+pub enum EncodingFormat {
+    #[serde(rename = "float")]
+    Float,
+    #[serde(rename = "base64")]
+    Base64,
 }
 
 /// Supported embedding models by VoyageAI
@@ -63,20 +107,23 @@ impl EmbeddingModel {
     }
 }
 
-/// Input type for embeddings
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum InputType {
-    #[serde(rename = "query")]
-    Query,
-    #[serde(rename = "document")]
-    Document,
+#[derive(Debug, Serialize)]
+pub struct EmbeddingsRequest {
+    pub input: EmbeddingsInput,
+    pub model: EmbeddingModel,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub input_type: Option<InputType>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub truncation: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub encoding_format: Option<EncodingFormat>,
 }
 
-/// Encoding format for embeddings
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum EncodingFormat {
-    #[serde(rename = "float")]
-    Float,
-    #[serde(rename = "base64")]
-    Base64,
+impl EmbeddingsRequest {
+    pub async fn send(self, client: &VoyageAiClient) -> Result<EmbeddingsResponse, VoyageError> {
+        client.embeddings().create_embedding(&self).await
+    }
 }
+
+pub use EmbeddingsInput as Input;
+pub use EmbeddingsRequest as Request;

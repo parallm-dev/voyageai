@@ -1,8 +1,10 @@
+extern crate approx;
+
 use approx::assert_relative_eq;
 use std::env;
-use voyageai::builder::embeddings::{EmbeddingsRequestBuilder, InputType};
-use voyageai::models::embeddings::EmbeddingModel;
-use voyageai::{VoyageAiClient, VoyageConfig};
+use voyageai::builder::embeddings::EmbeddingsRequestBuilder;
+use voyageai::models::embeddings::{EmbeddingModel, EmbeddingsInput};
+use voyageai::{InputType, VoyageAiClient, VoyageConfig};
 
 fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
     let dot_product: f32 = a.iter().zip(b.iter()).map(|(x, y)| x * y).sum();
@@ -24,7 +26,9 @@ async fn test_embeddings_similarity() {
     ];
 
     let request = EmbeddingsRequestBuilder::new()
-        .input_multiple(texts.clone())
+        .input(EmbeddingsInput::Multiple(
+            texts.iter().map(|&s| s.to_string()).collect(),
+        ))
         .model(EmbeddingModel::Voyage3)
         .input_type(InputType::Document)
         .build()

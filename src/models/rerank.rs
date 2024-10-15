@@ -2,16 +2,16 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RerankResponse {
-    pub results: Vec<RerankResult>,
+    pub object: String,
+    pub data: Vec<RerankResult>,
     pub model: String,
     pub usage: Usage,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RerankResult {
-    pub document: String,
-    pub index: usize,
     pub relevance_score: f64,
+    pub index: usize,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

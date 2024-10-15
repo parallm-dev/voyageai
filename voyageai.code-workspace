@@ -2,9 +2,6 @@
 	"folders": [
 		{
 			"path": "."
-		},
-		{
-			"path": "../../../knowledge/parallm/llm/voyageai"
 		}
 	],
 	"settings": {}

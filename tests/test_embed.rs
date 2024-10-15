@@ -1,6 +1,6 @@
-use voyageai::builder::embeddings::{EmbeddingsRequestBuilder, InputType};
-use voyageai::models::embeddings::EmbeddingModel;
-use voyageai::{VoyageAiClient, VoyageConfig};
+use voyageai::builder::embeddings::EmbeddingsRequestBuilder;
+use voyageai::models::embeddings::{EmbeddingModel, EmbeddingsInput};
+use voyageai::{InputType, VoyageAiClient, VoyageConfig};
 
 #[tokio::test]
 async fn test_embedding() {
@@ -15,7 +15,9 @@ async fn test_embedding() {
     ];
 
     let request = EmbeddingsRequestBuilder::new()
-        .input_multiple(inputs.clone())
+        .input(EmbeddingsInput::Multiple(
+            inputs.iter().map(|&s| s.to_string()).collect(),
+        ))
         .model(EmbeddingModel::Voyage3)
         .input_type(InputType::Document)
         .build()
@@ -54,7 +56,7 @@ async fn test_embedding_single_input() {
     let input = "This is a single test sentence.";
 
     let request = EmbeddingsRequestBuilder::new()
-        .input(input.to_string())
+        .input(EmbeddingsInput::Single(input.to_string()))
         .model(EmbeddingModel::Voyage3)
         .input_type(InputType::Document)
         .build()

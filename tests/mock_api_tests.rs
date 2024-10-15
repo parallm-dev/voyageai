@@ -72,9 +72,8 @@ async fn test_rerank_api() {
         .with_body(
             r#"
             {
-                "results": [
+                "data": [
                     {
-                        "document": "Paris is the capital of France.",
                         "relevance_score": 0.95,
                         "index": 0
                     }
@@ -100,13 +99,10 @@ async fn test_rerank_api() {
 
     let response = client.rerank().rerank(&request).await.unwrap();
 
-    assert_eq!(response.results.len(), 1);
-    assert_eq!(
-        response.results[0].document,
-        "Paris is the capital of France."
-    );
-    assert_eq!(response.results[0].relevance_score, 0.95);
-    assert_eq!(response.results[0].index, 0);
+    assert!(!response.data.is_empty(), "Expected at least one result");
+    let first_result = &response.data[0];
+    assert_eq!(first_result.relevance_score, 0.95);
+    assert_eq!(first_result.index, 0);
     assert_eq!(response.model, "rerank-2");
     assert_eq!(response.usage.total_tokens, 10);
 }

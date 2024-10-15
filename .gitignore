@@ -86,6 +86,8 @@ third-party/**/
 knowledge/.obsidian
 knowledge/.obsidian/*
 
-notebooks/leads
-notebooks/leads/*
-notebooks/leads/**/*
+.cursorignore
+*.code-workspace
+./ZED_CONVENTIONS.md
+.aider.tags.cache.v3
+.aider.tags.cache.v3/*

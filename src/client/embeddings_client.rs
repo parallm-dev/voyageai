@@ -1,4 +1,4 @@
-use crate::builder::embeddings::EmbeddingsRequest;
+use crate::models::embeddings::{EmbeddingsRequest, EmbeddingsResponse};
 use crate::client::RateLimiter;
 use crate::config::VoyageConfig;
 use crate::errors::VoyageError;
@@ -10,26 +10,6 @@ use tokio::time::sleep;
 
 /// Base URL for the Voyage AI API.
 pub const BASE_URL: &str = "https://api.voyageai.com/v1";
-
-/// Response structure for embedding requests.
-#[derive(Debug, Deserialize)]
-pub struct EmbeddingsResponse {
-    /// The type of object returned.
-    pub object: String,
-    /// A list of embedding data.
-    pub data: Vec<EmbeddingData>,
-    /// The model used for generating embeddings.
-    pub model: String,
-    /// Usage statistics for the request.
-    pub usage: Usage,
-}
-
-/// Usage statistics for an embedding request.
-#[derive(Debug, Deserialize)]
-pub struct Usage {
-    /// The total number of tokens used in the request.
-    pub total_tokens: u32,
-}
 
 /// Client for interacting with the Voyage AI embeddings API.
 #[derive(Debug, Clone)]

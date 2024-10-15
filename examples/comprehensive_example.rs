@@ -1,14 +1,17 @@
-use std::env;
-use voyageai::builder::embeddings::{EmbeddingsRequestBuilder, InputType};
+use voyageai::builder::embeddings::EmbeddingsRequestBuilder;
 use voyageai::models::embeddings::EmbeddingModel;
 use voyageai::models::rerank::{RerankModel, RerankRequest};
-use voyageai::{VoyageAiClient, VoyageConfig, VoyageError};
+use voyageai::{InputType, VoyageAiClient, VoyageConfig, VoyageError};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Set up the client
-    let api_key = env::var("VOYAGE_API_KEY").expect("VOYAGE_API_KEY must be set");
-    let config = VoyageConfig::new(api_key);
+    // Set up the client using the Default implementation of VoyageConfig
+    let config = VoyageConfig::default();
+    if config.api_key().is_empty() {
+        eprintln!("Warning: VOYAGE_API_KEY environment variable is not set or empty.");
+        eprintln!("Please set the VOYAGE_API_KEY environment variable to use this example.");
+        std::process::exit(1);
+    }
     let client = VoyageAiClient::new(config);
 
     // Example text for embedding
@@ -69,8 +72,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match client.rerank().rerank(&rerank_request).await {
         Ok(response) => {
             println!("Documents reranked. Top results:");
-            for result in response.results.iter().take(2) {
-                println!("- {} (score: {})", result.document, result.relevance_score);
+            for result in response.data.iter().take(2) {
+                println!(
+                    "- {} (score: {})",
+                    documents[result.index], result.relevance_score
+                );
             }
             println!("Tokens used: {}", response.usage.total_tokens);
         }

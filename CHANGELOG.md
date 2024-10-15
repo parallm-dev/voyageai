@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.0] - 2023-XX-XX
 
-### Added
+### 2024-10-16
 
 - Support for new embedding models: Voyage3, Voyage3Lite, VoyageFinance2, VoyageMultilingual2, VoyageLaw2
 - Support for new rerank models: Rerank2, Rerank2Lite
@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0] - 2023-XX-XX
 
-### Added
+### 2024-10-15
 
 - Initial release of the VoyageAI Rust SDK
 - Basic support for embeddings and reranking

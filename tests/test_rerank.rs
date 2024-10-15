@@ -26,15 +26,19 @@ async fn test_rerank() -> Result<(), Box<dyn Error>> {
 
     let response = client.rerank().rerank(&rerank_request).await?;
 
-    assert_eq!(
-        response.results.len(),
-        2,
-        "Expected 2 results due to top_k parameter"
-    );
-    assert!(
-        response.results[0].relevance_score >= response.results[1].relevance_score,
-        "Results should be sorted by relevance score"
-    );
+    if !response.data.is_empty() {
+        assert_eq!(
+            response.data.len(),
+            2,
+            "Expected 2 results due to top_k parameter"
+        );
+        assert!(
+            response.data[0].relevance_score >= response.data[1].relevance_score,
+            "Results should be sorted by relevance score"
+        );
+    } else {
+        panic!("Rerank operation returned empty results");
+    }
 
     Ok(())
 }

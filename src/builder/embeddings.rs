@@ -1,81 +1,42 @@
-use crate::errors::VoyageBuilderError as EmbeddingsBuilderError;
-use crate::models::EmbeddingModel;
-use crate::VoyageAiClient;
-use crate::VoyageError;
-use serde::{Deserialize, Serialize};
+use crate::models::embeddings::{
+    EmbeddingModel as EmbeddingModelType, EmbeddingsInput as EmbeddingsInputType,
+    EmbeddingsRequest as EmbeddingsRequestType, InputType as InputTypeEnum,
+};
 
-#[derive(Debug, Serialize, Deserialize)]
-pub enum Object {
-    #[serde(rename = "list")]
-    List,
-    #[serde(rename = "embedding")]
-    Embedding,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
-pub enum EncodingFormat {
-    #[serde(rename = "float")]
-    Float,
-    #[serde(rename = "base64")]
-    Base64,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct EmbeddingsResponse {
-    pub object: String,
-    pub data: Vec<EmbeddingData>,
-    pub model: EmbeddingModel,
-    pub usage: Usage,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct EmbeddingData {
-    pub object: String,
-    pub embedding: Vec<f32>,
-    pub index: usize,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Usage {
-    pub total_tokens: u32,
-}
-
-#[derive(Debug, Default)]
 pub struct EmbeddingsRequestBuilder {
-    input: Option<EmbeddingsInput>,
-    model: Option<EmbeddingModel>,
-    input_type: Option<InputType>,
+    input: Option<EmbeddingsInputType>,
+    model: Option<EmbeddingModelType>,
+    input_type: Option<InputTypeEnum>,
     truncation: Option<bool>,
-    encoding_format: Option<EncodingFormat>,
+}
+
+impl Default for EmbeddingsRequestBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl EmbeddingsRequestBuilder {
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            input: None,
+            model: None,
+            input_type: None,
+            truncation: None,
+        }
     }
 
-    pub fn input<T: Into<EmbeddingsInput>>(mut self, input: T) -> Self {
+    pub fn input(mut self, input: impl Into<EmbeddingsInputType>) -> Self {
         self.input = Some(input.into());
         self
     }
 
-    pub fn input_multiple<I, S>(mut self, input: I) -> Self
-    where
-        I: IntoIterator<Item = S>,
-        S: Into<String>,
-    {
-        self.input = Some(EmbeddingsInput::Multiple(
-            input.into_iter().map(Into::into).collect(),
-        ));
-        self
-    }
-
-    pub fn model(mut self, model: EmbeddingModel) -> Self {
+    pub fn model(mut self, model: EmbeddingModelType) -> Self {
         self.model = Some(model);
         self
     }
 
-    pub fn input_type(mut self, input_type: InputType) -> Self {
+    pub fn input_type(mut self, input_type: InputTypeEnum) -> Self {
         self.input_type = Some(input_type);
         self
     }
@@ -85,78 +46,16 @@ impl EmbeddingsRequestBuilder {
         self
     }
 
-    pub fn encoding_format(mut self, encoding_format: EncodingFormat) -> Self {
-        self.encoding_format = Some(encoding_format);
-        self
-    }
+    pub fn build(self) -> Result<EmbeddingsRequestType, &'static str> {
+        let input = self.input.ok_or("Input is required")?;
+        let model = self.model.ok_or("Model is required")?;
 
-    pub fn build(self) -> Result<EmbeddingsRequest, EmbeddingsBuilderError> {
-        let input = self.input.ok_or(EmbeddingsBuilderError::MissingInput)?;
-        let model = self.model.ok_or(EmbeddingsBuilderError::MissingModel)?;
-
-        match &input {
-            EmbeddingsInput::Single(_) => {}
-            EmbeddingsInput::Multiple(texts) => {
-                if texts.len() > 128 {
-                    return Err(EmbeddingsBuilderError::InputListTooLong);
-                }
-            }
-        }
-
-        Ok(EmbeddingsRequest {
+        Ok(EmbeddingsRequestType {
             input,
             model,
             input_type: self.input_type,
             truncation: self.truncation,
-            encoding_format: self.encoding_format,
+            encoding_format: None,
         })
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum InputType {
-    #[serde(rename = "query")]
-    Query,
-    #[serde(rename = "document")]
-    Document,
-}
-
-#[derive(Debug, Serialize)]
-#[serde(untagged)]
-pub enum EmbeddingsInput {
-    Single(String),
-    Multiple(Vec<String>),
-}
-
-impl<T: Into<String>> From<T> for EmbeddingsInput {
-    fn from(s: T) -> Self {
-        EmbeddingsInput::Single(s.into())
-    }
-}
-
-impl<T: Into<String>> FromIterator<T> for EmbeddingsInput {
-    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        EmbeddingsInput::Multiple(iter.into_iter().map(Into::into).collect())
-    }
-}
-
-#[derive(Debug, Serialize)]
-pub struct EmbeddingsRequest {
-    pub input: EmbeddingsInput,
-    pub model: EmbeddingModel,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub input_type: Option<InputType>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub truncation: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub encoding_format: Option<EncodingFormat>,
-}
-
-impl EmbeddingsRequest {
-    pub async fn send(
-        self,
-        client: &VoyageAiClient,
-    ) -> Result<crate::client::embeddings_client::EmbeddingsResponse, VoyageError> {
-        client.embeddings().create_embedding(&self).await
     }
 }

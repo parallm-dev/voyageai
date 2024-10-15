@@ -65,15 +65,33 @@ impl RerankClient {
 
         if status.is_success() {
             debug!("Rerank request successful");
-            let rerank_response: RerankResponse = serde_json::from_str(&text)?;
+            debug!("Raw API response: {}", text);
+            let rerank_response: RerankResponse = match serde_json::from_str(&text) {
+                Ok(response) => response,
+                Err(e) => {
+                    warn!("Failed to parse rerank response: {:?}", e);
+                    warn!("Raw response: {}", text);
+                    return Err(VoyageError::JsonError(e.to_string()));
+                }
+            };
 
             self.rate_limiter
                 .update_reranking_usage(rerank_response.usage.total_tokens)
                 .await;
 
+            if rerank_response.data.is_empty() {
+                warn!("Rerank response contains no results");
+            } else {
+                debug!(
+                    "Rerank response contains {} results",
+                    rerank_response.data.len()
+                );
+            }
+
             Ok(rerank_response)
         } else {
             warn!("Rerank request failed with status: {}", status);
+            warn!("Error response body: {}", text);
             Err(VoyageError::ApiError(status, text))
         }
     }

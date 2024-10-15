@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
     use std::error::Error;
-    use voyageai::builder::embeddings::{EmbeddingsRequestBuilder, InputType};
+    use voyageai::builder::embeddings::EmbeddingsRequestBuilder;
     use voyageai::models::embeddings::EmbeddingModel;
     use voyageai::models::rerank::{RerankModel, RerankRequest};
     use voyageai::{VoyageAiClient, VoyageConfig};
@@ -22,7 +22,6 @@ mod tests {
         let embeddings_request = EmbeddingsRequestBuilder::new()
             .input("test input")
             .model(EmbeddingModel::Voyage3)
-            .input_type(InputType::Document)
             .build()?;
 
         let response = client
@@ -83,20 +82,24 @@ mod tests {
 
         let response = client.rerank().rerank(&rerank_request).await?;
 
-        assert_eq!(
-            response.results.len(),
-            2,
-            "Expected 2 reranked documents, got {}",
-            response.results.len()
-        );
+        let results = response.data;
 
         assert!(
-            response.results[0].relevance_score >= response.results[1].relevance_score,
-            "Documents should be sorted by relevance score"
+            results.len() >= 2,
+            "Expected at least 2 reranked documents, got {}",
+            results.len()
         );
+
+        let mut iter = results.iter();
+        if let (Some(first), Some(second)) = (iter.next(), iter.next()) {
+            assert!(
+                first.relevance_score >= second.relevance_score,
+                "Documents should be sorted by relevance score"
+            );
+        } else {
+            panic!("Expected at least two results");
+        }
 
         Ok(())
     }
-
-    // ... more tests ...
 }

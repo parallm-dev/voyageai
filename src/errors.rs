@@ -3,6 +3,20 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum VoyageError {
+    #[error("Search builder error: {0}")]
+    SearchBuilderError(String),
+    #[error("Search index not built")]
+    SearchIndexNotBuilt,
+
+    #[error("Invalid search query: {0}")]
+    InvalidSearchQuery(String),
+
+    #[error("Search dimension mismatch: expected {expected}, got {actual}")]
+    SearchDimensionMismatch { expected: usize, actual: usize },
+
+    #[error("Search result error: {0}")]
+    SearchResultError(String),
+
     #[error("Bad Request (400): Invalid request format or parameters - {message}")]
     BadRequest { message: String },
 

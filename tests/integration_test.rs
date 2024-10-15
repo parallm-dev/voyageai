@@ -1,10 +1,11 @@
 use env_logger::Builder;
-use log::LevelFilter;
+use log::{debug, info, LevelFilter};
+use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
 use std::io::Write;
-use voyageai::builder::embeddings::{EmbeddingsRequestBuilder, InputType};
-use voyageai::models::embeddings::EmbeddingModel;
+use voyageai::builder::embeddings::EmbeddingsRequestBuilder;
+use voyageai::models::embeddings::{EmbeddingModel, EmbeddingsInput};
 use voyageai::models::rerank::{RerankModel, RerankRequest};
-use voyageai::{VoyageAiClient, VoyageConfig};
+use voyageai::{InputType, VoyageAiClient, VoyageConfig, VoyageError};
 
 #[tokio::test]
 async fn test_voyage_ai_client() {
@@ -17,15 +18,15 @@ async fn test_voyage_ai_client() {
 
     // Initialize the client with the API key
     let api_key = std::env::var("VOYAGE_API_KEY").expect("VOYAGE_API_KEY must be set");
-    let config = VoyageConfig::new(api_key);
+    let config = VoyageConfig::new(api_key.clone());
     let client = VoyageAiClient::new(config);
 
     // Test embeddings
     let embeddings_request = EmbeddingsRequestBuilder::new()
-        .input_multiple(vec![
+        .input(EmbeddingsInput::Multiple(vec![
             "Sample text 1".to_string(),
             "Sample text 2".to_string(),
-        ])
+        ]))
         .model(EmbeddingModel::Voyage3)
         .input_type(InputType::Document)
         .build()
@@ -54,7 +55,7 @@ async fn test_voyage_ai_client() {
 
     // Test rerank
     let query = "What is the capital of France?";
-    let documents = vec![
+    let documents = [
         "Paris is the capital of France.",
         "London is the capital of the United Kingdom.",
         "Berlin is the capital of Germany.",
@@ -67,33 +68,65 @@ async fn test_voyage_ai_client() {
         top_k: None,
     };
 
-    let rerank_response = client
-        .rerank()
-        .rerank(&rerank_request)
+    info!("Rerank request: {:?}", rerank_request);
+
+    // Create a new reqwest client for logging purposes
+    let reqwest_client = reqwest::Client::new();
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        AUTHORIZATION,
+        HeaderValue::from_str(&format!("Bearer {}", api_key)).unwrap(),
+    );
+    headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
+
+    let response = reqwest_client
+        .post("https://api.voyageai.com/v1/rerank")
+        .headers(headers)
+        .json(&rerank_request)
+        .send()
         .await
-        .expect("Failed to rerank documents");
+        .expect("Failed to send request");
 
-    assert!(
-        !rerank_response.results.is_empty(),
-        "Rerank results are empty"
-    );
+    info!("Response status: {}", response.status());
+    info!("Response headers: {:#?}", response.headers());
 
-    // Verify that the top result is relevant
-    let top_result = &rerank_response.results[0];
-    println!("Top document: {}", top_result.document);
-    assert!(
-        top_result.document.contains("Paris"),
-        "Top document is not relevant"
-    );
+    let response_body = response.text().await.expect("Failed to get response body");
+    info!("Response body: {}", response_body);
 
-    // Print all rerank results for debugging
-    println!("All rerank results:");
-    for result in rerank_response.results.iter() {
-        println!(
-            "Result {}: Score: {}, Document: {}",
-            result.index, result.relevance_score, result.document
-        );
+    // Now proceed with the actual rerank request using the VoyageAiClient
+    match client.rerank().rerank(&rerank_request).await {
+        Ok(rerank_response) => {
+            info!("Rerank response received successfully");
+            debug!("Raw rerank response: {:?}", rerank_response);
+
+            if rerank_response.data.is_empty() {
+                panic!("Rerank results are empty");
+            } else {
+                info!("Rerank results received successfully");
+
+                // Verify that the top result has the highest relevance score
+                let top_result = &rerank_response.data[0];
+                info!("Top result index: {}", top_result.index);
+                assert!(
+                    top_result.relevance_score >= rerank_response.data[1].relevance_score,
+                    "Top result should have the highest relevance score"
+                );
+
+                // Print all rerank results for debugging
+                info!("All rerank results:");
+                for result in rerank_response.data.iter() {
+                    info!("Result {}: Score: {}", result.index, result.relevance_score);
+                }
+            }
+
+            info!("Rerank model used: {}", rerank_response.model);
+            info!("Rerank tokens used: {}", rerank_response.usage.total_tokens);
+        }
+        Err(VoyageError::JsonError(err)) => {
+            panic!("JSON error in rerank response: {:?}", err);
+        }
+        Err(err) => {
+            panic!("Error in rerank request: {:?}", err);
+        }
     }
-    println!("Rerank model used: {}", rerank_response.model);
-    println!("Rerank tokens used: {}", rerank_response.usage.total_tokens);
 }

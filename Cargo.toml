@@ -1,35 +1,19 @@
 [package]
 name = "voyageai"
-version = "0.2.0"
+version = "0.1.0"
 edition = "2021"
-authors = ["David Maple <david@parallm.dev>"]
-description = "A client for VoyageAI API"
-license = "BSD-0-Clause"
-repository = "https://github.com/parallm/voyageai-rs"
-readme = "README.md"
-keywords = ["ai", "client", "api"]
-categories = ["api-bindings", "asynchronous"]
 
 [dependencies]
-async-trait = "0.1.83"
-reqwest = { version = "0.11", features = ["json", "rustls"] }
-serde = { version = "1.0.210", features = ["derive"] }
+reqwest = { version = "0.11", features = ["json"] }
+tokio = { version = "1.0", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-thiserror = "1.0.64"
-tokio = { version = "1.28", features = ["rt-multi-thread", "macros"] }
-tiktoken-rs = "0.5.9"
-futures = "0.3"
-url = "2.5.2"
+thiserror = "1.0"
+async-trait = "0.1"
 log = "0.4"
+env_logger = "0.10"
+clap = "3.0"
 
 [dev-dependencies]
-approx = "0.5.1"
 mockito = "1.0"
-env_logger = "0.10.0"
-
-[features]
-default = []
-
-[lib]
-name = "voyageai"
-path = "src/lib.rs"
+approx = "0.5"
