@@ -1,11 +1,16 @@
 use crate::client::client_limiter::RateLimiter;
+use crate::client::embeddings_client::EmbeddingClient;
+use crate::client::rerank_client::RerankClient;
 use crate::config::VoyageConfig;
 use crate::errors::VoyageBuilderError;
+use std::sync::Arc;
 
 #[derive(Clone, Debug)]
 pub struct VoyageAiClient {
-    pub(crate) embeddings_client: crate::client::embeddings_client::EmbeddingClient,
-    pub(crate) rerank_client: crate::client::rerank_client::RerankClient,
+    pub(crate) embeddings_client: EmbeddingClient,
+    pub(crate) rerank_client: RerankClient,
+    #[allow(dead_code)]
+    pub(crate) rate_limiter: Arc<RateLimiter>,
 }
 
 impl VoyageAiClient {
@@ -13,19 +18,19 @@ impl VoyageAiClient {
         VoyageBuilder::new()
     }
 
-    pub fn embeddings(&self) -> &crate::client::embeddings_client::EmbeddingClient {
+    pub fn embeddings(&self) -> &EmbeddingClient {
         &self.embeddings_client
     }
 
-    pub fn rerank(&self) -> &crate::client::rerank_client::RerankClient {
+    pub fn rerank(&self) -> &RerankClient {
         &self.rerank_client
     }
 
-    pub fn embeddings_mut(&mut self) -> &mut crate::client::embeddings_client::EmbeddingClient {
+    pub fn embeddings_mut(&mut self) -> &mut EmbeddingClient {
         &mut self.embeddings_client
     }
 
-    pub fn rerank_mut(&mut self) -> &mut crate::client::rerank_client::RerankClient {
+    pub fn rerank_mut(&mut self) -> &mut RerankClient {
         &mut self.rerank_client
     }
 }
@@ -33,11 +38,11 @@ impl VoyageAiClient {
 impl Default for VoyageAiClient {
     fn default() -> Self {
         let config = VoyageConfig::default();
+        let rate_limiter = Arc::new(RateLimiter::new());
         Self {
-            embeddings_client: crate::client::embeddings_client::EmbeddingClient::new(
-                config.clone(),
-            ),
-            rerank_client: crate::client::rerank_client::RerankClient::new(String::new()),
+            embeddings_client: EmbeddingClient::new(config.clone(), rate_limiter.clone()),
+            rerank_client: RerankClient::new(config, rate_limiter.clone()),
+            rate_limiter,
         }
     }
 }
@@ -76,22 +81,19 @@ impl VoyageBuilder {
         };
 
         let _client = self.client.unwrap_or_default();
-        let config = self.config.unwrap_or_default();
+        let config = self.config.unwrap_or_else(|| VoyageConfig::new(api_key));
+        let rate_limiter = Arc::new(RateLimiter::new());
 
-        let _rate_limiter = RateLimiter::new(config.rate_limit_duration);
-
-        let embeddings_client =
-            crate::client::embeddings_client::EmbeddingClient::new(config.clone());
-        let rerank_client = crate::client::rerank_client::RerankClient::new(api_key.clone());
+        let embeddings_client = EmbeddingClient::new(config.clone(), rate_limiter.clone());
+        let rerank_client = RerankClient::new(config, rate_limiter.clone());
 
         Ok(VoyageAiClient {
             embeddings_client,
             rerank_client,
+            rate_limiter,
         })
     }
 }
-
-// Removed unused functions
 
 pub use crate::builder::embeddings::EmbeddingsRequest;
 pub use crate::builder::rerank::RerankRequest;

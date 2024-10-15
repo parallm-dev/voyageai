@@ -1,138 +1,111 @@
 use async_trait::async_trait;
+use log::{debug, info, warn};
 use reqwest::Client;
-use serde::{Deserialize, Serialize};
+use std::sync::Arc;
+use tokio::time::sleep;
 
+use crate::client::RateLimiter;
+use crate::config::VoyageConfig;
+use crate::errors::VoyageError;
+use crate::models::rerank::{RerankRequest, RerankResponse};
+
+/// Base URL for the Voyage AI API.
 pub const BASE_URL: &str = "https://api.voyageai.com/v1";
 
-#[derive(Debug, Deserialize, Clone, Serialize)]
-pub struct RerankResponse {
-    pub model: String,
-    pub results: Vec<RerankResult>,
-    pub usage: Usage,
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct RerankResult {
-    pub document: String,
-    pub index: usize,
-    pub relevance_score: f64,
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct Usage {
-    pub prompt_tokens: u32,
-    pub total_tokens: u32,
-}
-
-pub use crate::client::voyage_client::VoyageAiClient;
-
+/// Client for interacting with the Voyage AI reranking API.
 #[derive(Clone, Debug)]
 pub struct RerankClient {
     client: Client,
-    api_key: String,
+    config: VoyageConfig,
+    rate_limiter: Arc<RateLimiter>,
 }
 
 impl RerankClient {
-    pub fn new(api_key: impl Into<String>) -> Self {
+    /// Creates a new `RerankClient` instance.
+    pub fn new(config: VoyageConfig, rate_limiter: Arc<RateLimiter>) -> Self {
+        debug!("Creating new RerankClient");
         Self {
             client: Client::new(),
-            api_key: api_key.into(),
+            config,
+            rate_limiter,
         }
     }
 
-    pub fn builder() -> RerankClientBuilder {
-        RerankClientBuilder::default()
-    }
-
-    pub async fn rerank(&self, request: RerankRequest) -> Result<RerankResponse, VoyageError> {
+    /// Reranks documents based on the given request.
+    pub async fn rerank(&self, request: &RerankRequest) -> Result<RerankResponse, VoyageError> {
         let url = format!("{}/rerank", BASE_URL);
+        debug!("Reranking documents with URL: {}", url);
 
+        let estimated_tokens = self.estimate_tokens(request);
+        debug!("Estimated tokens for request: {}", estimated_tokens);
+
+        let wait_time = self
+            .rate_limiter
+            .check_reranking_limit(estimated_tokens)
+            .await;
+        if wait_time.as_secs() > 0 {
+            info!(
+                "Rate limit reached. Waiting for {} seconds",
+                wait_time.as_secs()
+            );
+            sleep(wait_time).await;
+        }
+
+        debug!("Sending rerank request");
         let response = self
             .client
             .post(&url)
-            .bearer_auth(&self.api_key)
-            .json(&request)
+            .bearer_auth(self.config.api_key())
+            .json(request)
             .send()
             .await?;
 
-        if response.status().is_success() {
-            let rerank_response = response.json::<RerankResponse>().await?;
+        let status = response.status();
+        let text = response.text().await?;
+
+        if status.is_success() {
+            debug!("Rerank request successful");
+            let rerank_response: RerankResponse = serde_json::from_str(&text)?;
+
+            self.rate_limiter
+                .update_reranking_usage(rerank_response.usage.total_tokens)
+                .await;
+
             Ok(rerank_response)
         } else {
-            Err(VoyageError::ApiError(response.text().await?))
+            warn!("Rerank request failed with status: {}", status);
+            Err(VoyageError::ApiError(status, text))
         }
     }
-}
 
-#[derive(Default)]
-pub struct RerankClientBuilder {
-    api_key: Option<String>,
-    client: Option<Client>,
-}
+    fn estimate_tokens(&self, request: &RerankRequest) -> u32 {
+        fn tokenize(text: &str) -> usize {
+            text.split(|c: char| c.is_whitespace() || !c.is_alphanumeric())
+                .filter(|s| !s.is_empty())
+                .count()
+        }
 
-impl RerankClientBuilder {
-    pub fn new() -> Self {
-        Self::default()
-    }
+        let query_tokens = tokenize(&request.query) as u32;
+        let doc_tokens: u32 = request
+            .documents
+            .iter()
+            .map(|doc| tokenize(doc) as u32)
+            .sum();
 
-    pub fn api_key(mut self, api_key: String) -> Self {
-        self.api_key = Some(api_key);
-        self
-    }
-
-    pub fn client(mut self, client: Client) -> Self {
-        self.client = Some(client);
-        self
-    }
-
-    pub fn build(self) -> Result<RerankClient, VoyageError> {
-        let api_key = self.api_key.ok_or(VoyageError::MissingApiKey)?;
-        let client = self.client.unwrap_or_default();
-
-        Ok(RerankClient { client, api_key })
+        let total_tokens = query_tokens + doc_tokens;
+        debug!("Estimated token count: {}", total_tokens);
+        total_tokens
     }
 }
 
 #[async_trait]
 pub trait Rerank {
-    async fn rerank(&self, request: RerankRequest) -> Result<RerankResponse, VoyageError>;
+    async fn rerank(&self, request: &RerankRequest) -> Result<RerankResponse, VoyageError>;
 }
 
 #[async_trait]
 impl Rerank for RerankClient {
-    async fn rerank(&self, request: RerankRequest) -> Result<RerankResponse, VoyageError> {
+    async fn rerank(&self, request: &RerankRequest) -> Result<RerankResponse, VoyageError> {
         self.rerank(request).await
     }
 }
-
-impl std::fmt::Display for RerankResponse {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "Model: {}", self.model)?;
-        writeln!(f, "Results:")?;
-        for result in &self.results {
-            writeln!(
-                f,
-                "  Index: {}, Score: {:.4}",
-                result.index, result.relevance_score
-            )?;
-        }
-        writeln!(f, "Prompt tokens: {}", self.usage.prompt_tokens)?;
-        write!(f, "Total tokens: {}", self.usage.total_tokens)
-    }
-}
-
-impl RerankResponse {
-    pub fn top_results(&self, n: usize) -> Vec<&RerankResult> {
-        let mut sorted_results = self.results.iter().collect::<Vec<_>>();
-        sorted_results.sort_by(|a, b| {
-            b.relevance_score
-                .partial_cmp(&a.relevance_score)
-                .unwrap_or(std::cmp::Ordering::Equal)
-        });
-        sorted_results.truncate(n);
-        sorted_results
-    }
-}
-
-pub use crate::builder::RerankRequest;
-pub use crate::errors::VoyageError;

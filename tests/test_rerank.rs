@@ -1,23 +1,40 @@
-use voyageai::models::RerankModel;
-use voyageai::RerankRequestBuilder;
-use voyageai::VoyageAiClient;
+use std::error::Error;
+use voyageai::{
+    models::rerank::{RerankModel, RerankRequest},
+    VoyageAiClient, VoyageConfig,
+};
 
 #[tokio::test]
-async fn test_rerank() {
-    let client = VoyageAiClient::builder()
-        .api_key("test_api_key")
-        .build()
-        .expect("Failed to build VoyageAiClient");
+async fn test_rerank() -> Result<(), Box<dyn Error>> {
+    let api_key = std::env::var("VOYAGE_API_KEY").expect("VOYAGE_API_KEY must be set");
+    let config = VoyageConfig::new(api_key);
+    let client = VoyageAiClient::new(config);
 
-    let rerank_request = RerankRequestBuilder::new()
-        .query("test query")
-        .documents(vec!["doc1", "doc2", "doc3"])
-        .model(RerankModel::V2)
-        .build()
-        .expect("Failed to build rerank request");
+    let query = "What is the capital of France?";
+    let documents = [
+        "Paris is the capital of France.",
+        "London is the capital of the United Kingdom.",
+        "Berlin is the capital of Germany.",
+    ];
 
-    let response = client.rerank().rerank(rerank_request).await;
-    assert!(response.is_ok());
-    let rerank_response = response.unwrap();
-    assert_eq!(rerank_response.results.len(), 3);
+    let rerank_request = RerankRequest {
+        query: query.to_string(),
+        documents: documents.iter().map(|&s| s.to_string()).collect(),
+        model: RerankModel::Rerank2,
+        top_k: Some(2),
+    };
+
+    let response = client.rerank().rerank(&rerank_request).await?;
+
+    assert_eq!(
+        response.results.len(),
+        2,
+        "Expected 2 results due to top_k parameter"
+    );
+    assert!(
+        response.results[0].relevance_score >= response.results[1].relevance_score,
+        "Results should be sorted by relevance score"
+    );
+
+    Ok(())
 }

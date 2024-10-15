@@ -1,5 +1,8 @@
 use approx::assert_relative_eq;
-use voyageai::{EmbeddingModel, VoyageAiClient};
+use std::env;
+use voyageai::builder::embeddings::{EmbeddingsRequestBuilder, InputType};
+use voyageai::models::embeddings::EmbeddingModel;
+use voyageai::{VoyageAiClient, VoyageConfig};
 
 fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
     let dot_product: f32 = a.iter().zip(b.iter()).map(|(x, y)| x * y).sum();
@@ -10,62 +13,59 @@ fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
 
 #[tokio::test]
 async fn test_embeddings_similarity() {
-    let client = VoyageAiClient::builder()
-        .api_key("test_api_key")
+    let api_key = env::var("VOYAGE_API_KEY").expect("VOYAGE_API_KEY must be set");
+    let config = VoyageConfig::new(api_key);
+    let client = VoyageAiClient::new(config);
+
+    let texts = vec![
+        "The quick brown fox jumps over the lazy dog",
+        "A fast auburn canine leaps above an idle hound",
+        "The sky is blue",
+    ];
+
+    let request = EmbeddingsRequestBuilder::new()
+        .input_multiple(texts.clone())
+        .model(EmbeddingModel::Voyage3)
+        .input_type(InputType::Document)
         .build()
-        .expect("Failed to build client");
+        .expect("Failed to build embeddings request");
 
-    let obscure_document = "The tardigrade, also known as the water bear, is a microscopic animal that can survive extreme conditions, including the vacuum of space.";
-    let similar_query = "Tiny creatures that can live in space";
-    let dissimilar_query = "The economic impact of climate change on agriculture";
+    let response = client
+        .embeddings()
+        .create_embedding(&request)
+        .await
+        .expect("Failed to create embeddings");
 
-    // Generate embeddings for the document and queries
-    let generate_embedding = |text: &str| {
-        let client = client.clone();
-        let text = text.to_string();
-        async move {
-            let request = client
-                .embeddings()
-                .input(text)
-                .model(EmbeddingModel::Voyage3)
-                .build()
-                .expect("Failed to build embeddings request");
+    assert_eq!(response.data.len(), 3, "Expected 3 embeddings");
 
-            client
-                .embeddings()
-                .create_embedding(&request)
-                .await
-                .expect("Failed to create embedding")
-                .data[0]
-                .embedding
-                .clone()
-        }
-    };
+    let embedding1 = &response.data[0].embedding;
+    let embedding2 = &response.data[1].embedding;
+    let embedding3 = &response.data[2].embedding;
 
-    let document_embedding = generate_embedding(obscure_document).await;
-    let similar_query_embedding = generate_embedding(similar_query).await;
-    let dissimilar_query_embedding = generate_embedding(dissimilar_query).await;
+    let similarity_1_2 = cosine_similarity(embedding1, embedding2);
+    let similarity_1_3 = cosine_similarity(embedding1, embedding3);
+    let similarity_2_3 = cosine_similarity(embedding2, embedding3);
 
-    // Calculate similarities
-    let similarity_to_similar = cosine_similarity(&document_embedding, &similar_query_embedding);
-    let similarity_to_dissimilar =
-        cosine_similarity(&document_embedding, &dissimilar_query_embedding);
+    println!("Similarity between 1 and 2: {}", similarity_1_2);
+    println!("Similarity between 1 and 3: {}", similarity_1_3);
+    println!("Similarity between 2 and 3: {}", similarity_2_3);
 
-    // Assert that the similar query has a higher similarity score
     assert!(
-        similarity_to_similar > similarity_to_dissimilar,
-        "Expected similar query to have higher similarity. Similar: {}, Dissimilar: {}",
-        similarity_to_similar,
-        similarity_to_dissimilar
+        similarity_1_2 > similarity_1_3,
+        "Similarity between similar sentences should be higher"
+    );
+    assert!(
+        similarity_1_2 > similarity_2_3,
+        "Similarity between similar sentences should be higher"
     );
 
-    // Assert that the similar query has a relatively high similarity (adjust threshold as needed)
-    assert_relative_eq!(similarity_to_similar, 1.0, epsilon = 0.3);
-
-    // Assert that the dissimilar query has a relatively low similarity (adjust threshold as needed)
+    assert_relative_eq!(similarity_1_2, 1.0, epsilon = 0.1);
     assert!(
-        similarity_to_dissimilar < 0.5,
-        "Dissimilar query similarity too high: {}",
-        similarity_to_dissimilar
+        similarity_1_3 < 0.8,
+        "Unrelated sentences should have lower similarity"
+    );
+    assert!(
+        similarity_2_3 < 0.8,
+        "Unrelated sentences should have lower similarity"
     );
 }

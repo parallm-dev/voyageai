@@ -40,8 +40,7 @@ pub struct Usage {
     pub total_tokens: u32,
 }
 
-#[derive(Debug)]
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct EmbeddingsRequestBuilder {
     input: Option<EmbeddingsInput>,
     model: Option<EmbeddingModel>,
@@ -49,6 +48,7 @@ pub struct EmbeddingsRequestBuilder {
     truncation: Option<bool>,
     encoding_format: Option<EncodingFormat>,
 }
+
 impl EmbeddingsRequestBuilder {
     pub fn new() -> Self {
         Self::default()
@@ -104,24 +104,25 @@ impl EmbeddingsRequestBuilder {
         }
 
         Ok(EmbeddingsRequest {
-            input: match input {
-                EmbeddingsInput::Single(s) => vec![s],
-                EmbeddingsInput::Multiple(v) => v,
-            },
+            input,
             model,
+            input_type: self.input_type,
+            truncation: self.truncation,
             encoding_format: self.encoding_format,
-            user: None,
         })
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum InputType {
+    #[serde(rename = "query")]
     Query,
+    #[serde(rename = "document")]
     Document,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
+#[serde(untagged)]
 pub enum EmbeddingsInput {
     Single(String),
     Multiple(Vec<String>),
@@ -141,12 +142,14 @@ impl<T: Into<String>> FromIterator<T> for EmbeddingsInput {
 
 #[derive(Debug, Serialize)]
 pub struct EmbeddingsRequest {
-    pub input: Vec<String>,
+    pub input: EmbeddingsInput,
     pub model: EmbeddingModel,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub encoding_format: Option<EncodingFormat>,
+    pub input_type: Option<InputType>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub user: Option<String>,
+    pub truncation: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub encoding_format: Option<EncodingFormat>,
 }
 
 impl EmbeddingsRequest {

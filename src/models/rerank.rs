@@ -2,37 +2,40 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RerankResponse {
-    pub object: String,
-    pub rankings: Vec<Ranking>,
-    pub model: RerankModel,
+    pub results: Vec<RerankResult>,
+    pub model: String,
     pub usage: Usage,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Ranking {
+pub struct RerankResult {
+    pub document: String,
     pub index: usize,
-    pub score: f32,
+    pub relevance_score: f64,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum RerankModel {
-    #[serde(rename = "voyage-rerank-v2")]
-    V2,
-    #[serde(rename = "voyage-rerank-light-v2")]
-    LightV2,
+    #[serde(rename = "rerank-2")]
+    Rerank2,
+    #[serde(rename = "rerank-2-lite")]
+    Rerank2Lite,
+    #[serde(rename = "rerank-lite-1")]
+    RerankLite1,
 }
 
 impl RerankModel {
     pub const fn max_context_length(&self) -> usize {
         match self {
-            Self::V2 | Self::LightV2 => 4096,
+            Self::Rerank2 => 16000,
+            Self::Rerank2Lite | Self::RerankLite1 => 8000,
         }
     }
 
     pub const fn embedding_size(&self) -> usize {
         match self {
-            Self::V2 => 768,
-            Self::LightV2 => 384,
+            Self::Rerank2 => 768,
+            Self::Rerank2Lite | Self::RerankLite1 => 384,
         }
     }
 }
@@ -40,4 +43,13 @@ impl RerankModel {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Usage {
     pub total_tokens: u32,
+}
+
+#[derive(Debug, Serialize)]
+pub struct RerankRequest {
+    pub query: String,
+    pub documents: Vec<String>,
+    pub model: RerankModel,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub top_k: Option<usize>,
 }

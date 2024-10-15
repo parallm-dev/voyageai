@@ -1,7 +1,7 @@
-use crate::builder::EmbeddingsRequest;
+use crate::builder::embeddings::{EmbeddingsInput, EmbeddingsRequest};
+use crate::errors::VoyageError;
 use crate::models::EmbeddingModel;
 use crate::VoyageAiClient;
-use crate::VoyageError;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -88,7 +88,7 @@ impl GenerateOptionsBuilder {
     }
 
     pub fn build(self) -> Result<GenerateOptions, VoyageError> {
-        let model = self.model.ok_or(VoyageError::InvalidRequest {
+        let model = self.model.ok_or(VoyageError::BadRequest {
             message: "Model is required".to_string(),
         })?;
 
@@ -154,10 +154,11 @@ pub async fn llm(
     };
 
     let embeddings_request = EmbeddingsRequest {
-        input: vec![prompt.to_string()],
+        input: EmbeddingsInput::Single(prompt.to_string()),
         model: options.model,
+        input_type: None,
+        truncation: None,
         encoding_format: None,
-        user: None,
     };
 
     let _response = client

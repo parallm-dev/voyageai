@@ -1,62 +1,13 @@
-pub struct EmbeddingsResult {
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct EmbeddingsResponse {
+    pub object: String,
     pub data: Vec<EmbeddingData>,
-    pub model: EmbeddingModel,
+    pub model: String,
     pub usage: Usage,
 }
 
-use serde::{Deserialize, Serialize};
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum EmbeddingModel {
-    #[serde(rename = "voyage-large-2-instruct")]
-    VoyageLarge2Instruct,
-    #[serde(rename = "voyage-finance-2")]
-    VoyageFinance2,
-    #[serde(rename = "voyage-multilingual-2")]
-    VoyageMultilingual2,
-    #[serde(rename = "voyage-law-2")]
-    VoyageLaw2,
-    #[serde(rename = "voyage-code-2")]
-    VoyageCode2,
-    #[serde(rename = "voyage-large-2")]
-    VoyageLarge2,
-    #[serde(rename = "voyage-2")]
-    Voyage2,
-    #[serde(rename = "voyage-3")]
-    Voyage3,
-    #[serde(rename = "voyage-3-lite")]
-    Voyage3Lite,
-}
-
-impl EmbeddingModel {
-    pub fn context_length(&self) -> usize {
-        match self {
-            Self::VoyageLarge2Instruct => 16000,
-            Self::VoyageFinance2 => 32000,
-            Self::VoyageMultilingual2 => 32000,
-            Self::VoyageLaw2 => 16000,
-            Self::VoyageCode2 => 16000,
-            Self::VoyageLarge2 => 16000,
-            Self::Voyage2 => 4000,
-            Self::Voyage3 => 32000,
-            Self::Voyage3Lite => 32000,
-        }
-    }
-
-    pub fn embedding_dimension(&self) -> usize {
-        match self {
-            Self::VoyageLarge2Instruct => 1024,
-            Self::VoyageFinance2 => 1024,
-            Self::VoyageMultilingual2 => 1024,
-            Self::VoyageLaw2 => 1024,
-            Self::VoyageCode2 => 1536,
-            Self::VoyageLarge2 => 1536,
-            Self::Voyage2 => 1024,
-            Self::Voyage3 => 512,
-            Self::Voyage3Lite => 256,
-        }
-    }
-}
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EmbeddingData {
     pub object: String,
@@ -64,6 +15,68 @@ pub struct EmbeddingData {
     pub index: usize,
 }
 
-pub use self::EmbeddingModel as Embedding;
-pub use self::EmbeddingsResult as EmbeddingsModel;
-pub use super::Usage;
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Usage {
+    pub total_tokens: u32,
+}
+
+/// Supported embedding models by VoyageAI
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum EmbeddingModel {
+    #[serde(rename = "voyage-3")]
+    Voyage3,
+    #[serde(rename = "voyage-3-lite")]
+    Voyage3Lite,
+    #[serde(rename = "voyage-finance-2")]
+    VoyageFinance2,
+    #[serde(rename = "voyage-multilingual-2")]
+    VoyageMultilingual2,
+    #[serde(rename = "voyage-law-2")]
+    VoyageLaw2,
+}
+
+impl EmbeddingModel {
+    /// Returns the maximum context length for the model
+    pub fn max_context_length(&self) -> usize {
+        match self {
+            Self::Voyage3 | Self::Voyage3Lite => 32000,
+            Self::VoyageFinance2 | Self::VoyageMultilingual2 | Self::VoyageLaw2 => 16000,
+        }
+    }
+
+    /// Returns the maximum number of tokens that can be processed in a single request
+    pub fn max_tokens_per_request(&self) -> usize {
+        match self {
+            Self::Voyage3Lite => 1_000_000,
+            Self::Voyage3 => 320_000,
+            Self::VoyageFinance2 | Self::VoyageMultilingual2 | Self::VoyageLaw2 => 120_000,
+        }
+    }
+
+    /// Returns the embedding dimension for the model
+    pub fn embedding_dimension(&self) -> usize {
+        match self {
+            Self::Voyage3 => 512,
+            Self::Voyage3Lite => 256,
+            Self::VoyageFinance2 | Self::VoyageMultilingual2 | Self::VoyageLaw2 => 1024,
+        }
+    }
+}
+
+/// Input type for embeddings
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum InputType {
+    #[serde(rename = "query")]
+    Query,
+    #[serde(rename = "document")]
+    Document,
+}
+
+/// Encoding format for embeddings
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum EncodingFormat {
+    #[serde(rename = "float")]
+    Float,
+    #[serde(rename = "base64")]
+    Base64,
+}

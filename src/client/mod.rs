@@ -4,7 +4,7 @@ pub mod rerank_client;
 pub mod voyage_client;
 pub use client_limiter::RateLimiter;
 pub use embeddings_client::EmbeddingsResponse;
-pub use rerank_client::RerankResponse;
 pub use voyage_client::VoyageAiClient;
 
-pub use crate::client::rerank_client::RerankRequest;
+// Remove the private struct import
+// pub use crate::models::rerank::RerankResponse;

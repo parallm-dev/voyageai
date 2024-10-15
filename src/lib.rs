@@ -9,4 +9,10 @@ pub use builder::{EmbeddingsRequestBuilder, RerankRequestBuilder, VoyageBuilder}
 pub use client::voyage_client::VoyageAiClient;
 pub use config::VoyageConfig;
 pub use errors::{VoyageBuilderError, VoyageError};
-pub use models::{EmbeddingModel, RerankModel};
+pub use models::{
+    embeddings::{EmbeddingModel, InputType},
+    rerank::{RerankModel, RerankRequest, RerankResponse},
+};
+
+/// Re-export of the `tokio` crate for convenience.
+pub use tokio;

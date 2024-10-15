@@ -1,37 +1,13 @@
-# API Client for Voyage AI
+# VoyageAI Rust SDK
 
-
-This Rust crate provides an unofficial client for interacting with the Voyage AI API. It allows you to easily integrate Voyage AI's powerful language models into your Rust applications.
-
-## API Key Setup
-
-Before using the Voyage AI client, you need to set up your API key. There are two ways to do this:
-
-1. Environment Variable:
-   Set the `VOYAGE_API_KEY` environment variable with your API key:
-
-   ```bash
-   export VOYAGE_API_KEY=your_api_key_here
-   ```
-
-2. Programmatically:
-   You can also set the API key in your code:
-
-   ```rust
-   use voyage_ai_client::VoyageClientBuilder;
-
-   let client = VoyageClientBuilder::new()
-       .api_key("your_api_key_here")
-       .build()?;
-   ```
-
-Make sure to keep your API key secure and never commit it to version control.
+This SDK provides a Rust interface for the VoyageAI API, allowing you to easily integrate embedding and reranking capabilities into your Rust applications.
 
 ## Features
 
-- Simple and intuitive API
-- Async support using Tokio
-- Error handling with custom error types
+- Generate embeddings for text data using various models
+- Rerank documents based on relevance to a query
+- Automatic rate limiting and error handling
+- Comprehensive examples and tests
 
 ## Installation
 
@@ -39,65 +15,61 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-voyageai = "0.1.0"
+voyageai = "0.2.0"
 ```
 
-## Usage
-
-First, set up your Voyage AI API credentials as environment variables:
-
-```bash
-export VOYAGE_API_KEY=your_api_key_here
-```
-
-Then, in your Rust code:
+## Quick Start
 
 ```rust
-use voyage_ai_client::VoyageClient;
+use voyageai::{VoyageAiClient, VoyageConfig};
+use voyageai::builder::embeddings::{EmbeddingsRequestBuilder, InputType};
+use voyageai::models::embeddings::EmbeddingModel;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = VoyageClient::new()?;
+    let api_key = std::env::var("VOYAGE_API_KEY").expect("VOYAGE_API_KEY must be set");
+    let config = VoyageConfig::new(api_key);
+    let client = VoyageAiClient::new(config);
 
-    let response = client.generate_text("Once upon a time").await?;
-    println!("Generated text: {}", response);
+    let request = EmbeddingsRequestBuilder::new()
+        .input("Hello, world!")
+        .model(EmbeddingModel::Voyage3)
+        .input_type(InputType::Document)
+        .build()?;
+
+    let response = client.embeddings().create_embedding(&request).await?;
+    println!("Embedding: {:?}", response.data[0].embedding);
 
     Ok(())
 }
 ```
 
-## Configuration
-
-You can customize the client by using the `VoyageClientBuilder`:
-
-```rust
-use voyage_ai_client::{VoyageClientBuilder, ApiVersion};
-
-let client = VoyageClientBuilder::new()
-    .api_version(ApiVersion::V1)
-    .timeout(std::time::Duration::from_secs(30))
-    .build()?;
-```
-
-## Error Handling
-
-This crate uses custom error types to provide detailed error information. You can match on these errors to handle different error cases:
-
-```rust
-use voyage_ai_client::VoyageError;
-
-match client.generate_text("prompt").await {
-    Ok(response) => println!("Generated text: {}", response),
-    Err(VoyageError::ApiError(e)) => eprintln!("API error: {}", e),
-    Err(VoyageError::NetworkError(e)) => eprintln!("Network error: {}", e),
-    Err(e) => eprintln!("Other error: {}", e),
-}
-```
-
 ## Documentation
 
-For more detailed documentation, please run `cargo doc --open` or check the [online documentation](https://docs.rs/voyage_ai_client).
+For more detailed information on how to use this SDK, please refer to the [documentation](https://docs.rs/voyageai).
+
+## Examples
+
+Check out the `examples/` directory for more comprehensive examples of how to use this SDK.
+
+## Testing
+
+To run the tests, use:
+
+```
+cargo test
+```
+
+Note that some tests require a valid API key to be set in the `VOYAGE_API_KEY` environment variable.
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Support
+
+If you encounter any issues or have questions, please file an issue on the GitHub repository.

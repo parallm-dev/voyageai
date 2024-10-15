@@ -1,47 +1,58 @@
+use crate::models::{EmbeddingModel, RerankModel};
 use serde::Deserialize;
-use std::time::Duration;
 
-#[derive(Debug, Clone, Deserialize, Default)]
+#[allow(dead_code)]
+#[derive(Debug, Clone, Deserialize)]
+pub enum Model {
+    Embedding(EmbeddingModel),
+    Rerank(RerankModel),
+}
+
+impl Default for Model {
+    fn default() -> Self {
+        Model::Embedding(default_embedding_model())
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct VoyageConfig {
-    #[serde(default)]
     pub api_key: String,
-    #[serde(default)]
-    pub model: String,
-    #[serde(default = "default_base_url")]
     pub base_url: String,
-    #[serde(default = "default_timeout")]
-    pub timeout: u64,
-    #[serde(default = "default_rate_limit_duration")]
-    pub rate_limit_duration: Duration,
-    #[serde(default = "default_embedding_model")]
-    pub default_embedding_model: String,
 }
 
 impl VoyageConfig {
-    pub fn new(api_key: String, model: String) -> Self {
-        VoyageConfig {
+    pub fn new(api_key: String) -> Self {
+        Self {
             api_key,
-            model,
-            base_url: default_base_url(),
-            timeout: default_timeout(),
-            rate_limit_duration: default_rate_limit_duration(),
-            default_embedding_model: default_embedding_model(),
+            base_url: "https://api.voyageai.com/v1".to_string(),
+        }
+    }
+
+    pub fn with_base_url(mut self, base_url: impl Into<String>) -> Self {
+        self.base_url = base_url.into();
+        self
+    }
+
+    pub fn api_key(&self) -> &str {
+        &self.api_key
+    }
+}
+
+impl Default for VoyageConfig {
+    fn default() -> Self {
+        let api_key = std::env::var("VOYAGE_API_KEY").unwrap_or_default();
+        Self {
+            api_key,
+            base_url: "https://api.voyageai.com/v1".to_string(),
         }
     }
 }
 
-fn default_base_url() -> String {
-    String::from("https://api.voyageai.com/v1")
+fn default_embedding_model() -> EmbeddingModel {
+    EmbeddingModel::Voyage3
 }
 
-fn default_timeout() -> u64 {
-    30
-}
-
-fn default_rate_limit_duration() -> Duration {
-    Duration::from_millis(100)
-}
-
-fn default_embedding_model() -> String {
-    String::from("voyage-3")
+#[allow(dead_code)]
+fn default_reranker_model() -> RerankModel {
+    RerankModel::Rerank2
 }
