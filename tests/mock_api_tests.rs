@@ -1,5 +1,4 @@
-extern crate mockito;
-
+use mockito;
 use voyageai::{
     builder::embeddings::EmbeddingsRequestBuilder,
     models::{
@@ -12,6 +11,10 @@ use voyageai::{
 #[tokio::test]
 async fn test_embeddings_api() {
     let mut server = mockito::Server::new();
+    test_embeddings_api_inner(&mut server).await;
+}
+
+async fn test_embeddings_api_inner(server: &mut mockito::Server) {
     let mock_url = server.url();
 
     let _m = server
@@ -63,6 +66,10 @@ async fn test_embeddings_api() {
 #[tokio::test]
 async fn test_rerank_api() {
     let mut server = mockito::Server::new();
+    test_rerank_api_inner(&mut server).await;
+}
+
+async fn test_rerank_api_inner(server: &mut mockito::Server) {
     let mock_url = server.url();
 
     let _m = server
