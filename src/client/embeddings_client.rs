@@ -1,4 +1,4 @@
-use crate::models::embeddings::{EmbeddingsRequest, EmbeddingsResponse};
+use crate::models::embeddings::{EmbeddingsRequest, EmbeddingsResponse, EmbeddingData};
 use crate::client::RateLimiter;
 use crate::config::VoyageConfig;
 use crate::errors::VoyageError;
@@ -97,13 +97,3 @@ impl EmbeddingClient {
     }
 }
 
-/// Represents a single embedding in the response.
-#[derive(Debug, Deserialize)]
-pub struct EmbeddingData {
-    /// The type of object.
-    pub object: String,
-    /// The embedding vector.
-    pub embedding: Vec<f32>,
-    /// The index of this embedding in the request.
-    pub index: usize,
-}
