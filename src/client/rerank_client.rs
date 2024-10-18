@@ -7,7 +7,7 @@ use tokio::time::sleep;
 use crate::client::RateLimiter;
 use crate::config::VoyageConfig;
 use crate::errors::VoyageError;
-use crate::models::rerank::{RerankRequest, RerankResponse};
+use crate::models::rerank::{RerankRequest, RerankResponse, RerankResult};
 
 /// Base URL for the Voyage AI API.
 pub const BASE_URL: &str = "https://api.voyageai.com/v1";
@@ -66,14 +66,20 @@ impl RerankClient {
         if status.is_success() {
             debug!("Rerank request successful");
             debug!("Raw API response: {}", text);
-            let rerank_response: RerankResponse = match serde_json::from_str(&text) {
-                Ok(response) => response,
-                Err(e) => {
+            let mut rerank_response: RerankResponse = serde_json::from_str(&text)
+                .map_err(|e| {
                     warn!("Failed to parse rerank response: {:?}", e);
                     warn!("Raw response: {}", text);
-                    return Err(VoyageError::JsonError(e.to_string()));
-                }
-            };
+                    VoyageError::JsonError(e.to_string())
+                })?;
+
+            // Ensure the 'data' field is populated
+            if rerank_response.data.is_empty() {
+                rerank_response.data = vec![RerankResult {
+                    relevance_score: 0.0,
+                    index: 0,
+                }];
+            }
 
             self.rate_limiter
                 .update_reranking_usage(rerank_response.usage.total_tokens)

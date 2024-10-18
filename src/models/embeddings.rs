@@ -33,10 +33,12 @@ impl<T: Into<String>> FromIterator<T> for EmbeddingsInput {
 #[derive(Debug, Deserialize)]
 pub struct EmbeddingsResponse {
     /// The type of object returned.
+    #[serde(default)]
     pub object: String,
     /// A list of embedding data.
     pub data: Vec<EmbeddingData>,
     /// The model used for generating embeddings.
+    #[serde(default)]
     pub model: String,
     /// Usage statistics for the request.
     pub usage: Usage,

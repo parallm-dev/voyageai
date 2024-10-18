@@ -2,8 +2,10 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RerankResponse {
+    #[serde(default)]
     pub object: String,
     pub data: Vec<RerankResult>,
+    #[serde(default)]
     pub model: String,
     pub usage: Usage,
 }
