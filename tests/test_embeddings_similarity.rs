@@ -1,6 +1,7 @@
 extern crate approx;
 
 use approx::assert_relative_eq;
+use serde_json::json;
 
 use voyageai::builder::embeddings::EmbeddingsRequestBuilder;
 use voyageai::models::embeddings::{EmbeddingModel, EmbeddingsInput};
@@ -14,11 +15,12 @@ fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
 }
 
 #[cfg(test)]
-
-
+mod tests {
+    use super::*;
     use mockito;
+
     pub fn setup_mock_server() -> mockito::ServerGuard {
-        let server = mockito::Server::new();
+        let mut server = mockito::Server::new();
 
         let mock_response = json!({
             "object": "list",
@@ -55,19 +57,8 @@ fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
         server
     }
 
-#[tokio::test]
-
-mod tests {
-
-    use mockito;
-    use serde_json::json;
-
-    pub(crate) fn setup_mock_server() -> mockito::ServerGuard {
-        // ... existing setup_mock_server function implementation ...
-    }
-}
-
-async fn test_embeddings_similarity() {
+    #[tokio::test]
+    async fn test_embeddings_similarity() {
     let mock_server = setup_mock_server();
     let config = VoyageConfig::new("mock_api_key".to_string())
         .with_base_url(mock_server.url());
