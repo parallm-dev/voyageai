@@ -4,7 +4,6 @@ use crate::config::VoyageConfig;
 use crate::errors::VoyageError;
 use log::{debug, info, warn};
 use reqwest::Client;
-use serde::Deserialize;
 use std::sync::Arc;
 use tokio::time::sleep;
 
