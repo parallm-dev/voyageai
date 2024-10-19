@@ -15,6 +15,7 @@ impl Model {
             rerank: RerankRequestBuilder::new(),
             search: SearchRequestBuilder::new(),
             search: self.search.unwrap_or_else(SearchRequestBuilder::new),
+            search: self.search.unwrap_or_else(SearchRequestBuilder::new),
         }
     }
 
