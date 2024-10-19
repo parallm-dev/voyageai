@@ -151,7 +151,6 @@ fn euclidean_distance(a: &[f32], b: &[f32]) -> f32 {
 
         Ok(results)
     }
-}
 
 // Helper function to calculate cosine similarity
 fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
