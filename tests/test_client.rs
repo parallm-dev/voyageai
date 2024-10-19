@@ -41,15 +41,14 @@ mod tests {
             "Embedding should not be empty"
         );
 
-        let mut iter = results.iter();
-        if let (Some(first), Some(second)) = (iter.next(), iter.next()) {
-            assert!(
-                first.relevance_score >= second.relevance_score,
-                "Documents should be sorted by relevance score"
-            );
-        } else {
-            panic!("Expected at least two results");
-        }
+        assert!(
+            response.data.len() >= 2,
+            "Expected at least two results"
+        );
+        assert!(
+            response.data[0].relevance_score >= response.data[1].relevance_score,
+            "Documents should be sorted by relevance score"
+        );
 
         Ok(())
     }
