@@ -11,7 +11,6 @@ pub struct SearchRequest {
     pub documents: Vec<String>,
     pub top_k: Option<usize>,
     pub search_type: SearchType,
-}
 #[derive(Debug, Clone)]
 pub enum SearchType {
     Similarity,
@@ -153,7 +152,6 @@ fn euclidean_distance(a: &[f32], b: &[f32]) -> f32 {
         }
 
         Ok(results)
-    }
 
 // Helper function to calculate cosine similarity
 fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
