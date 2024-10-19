@@ -57,6 +57,7 @@ impl SearchClient {
                     score: distance as i32, // Convert to i32 for consistency
                     index,
                     search_type: SearchType::NearestNeighbor,
+                    search_type: SearchType::NearestNeighbor,
                 }
             })
             .collect::<Vec<_>>();
