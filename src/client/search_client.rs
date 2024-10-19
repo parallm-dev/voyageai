@@ -12,6 +12,14 @@ pub struct SearchRequest {
     pub top_k: Option<usize>,
     pub search_type: SearchType,
 #[derive(Debug, Clone)]
+pub struct SearchRequest {
+    pub query: String,
+    pub documents: Vec<String>,
+    pub top_k: Option<usize>,
+    pub search_type: SearchType,
+}
+
+#[derive(Debug, Clone)]
 pub enum SearchType {
     Similarity,
     NearestNeighbor,
@@ -102,6 +110,7 @@ impl SearchClient {
         }
 
         Ok(results)
+    }
 }
 
 // Helper function to calculate Euclidean distance
@@ -153,13 +162,14 @@ fn euclidean_distance(a: &[f32], b: &[f32]) -> f32 {
 
         Ok(results)
 
-// Helper function to calculate cosine similarity
-fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
-    let dot_product = a.iter().zip(b).map(|(x, y)| x * y).sum::<f32>();
-    let magnitude_a = a.iter().map(|x| x.powi(2)).sum::<f32>().sqrt();
-    let magnitude_b = b.iter().map(|x| x.powi(2)).sum::<f32>().sqrt();
-    dot_product / (magnitude_a * magnitude_b)
-}
+        // Helper function to calculate cosine similarity
+        fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
+            let dot_product = a.iter().zip(b).map(|(x, y)| x * y).sum::<f32>();
+            let magnitude_a = a.iter().map(|x| x.powi(2)).sum::<f32>().sqrt();
+            let magnitude_b = b.iter().map(|x| x.powi(2)).sum::<f32>().sqrt();
+            dot_product / (magnitude_a * magnitude_b)
+        }
+    }
     }
 
     /// Performs a BM25 search for improved text relevance.
@@ -259,7 +269,7 @@ fn tokenize(text: &str) -> Vec<&str> {
     text.split_whitespace().collect()
 }
 
-// ... (keep other existing methods)
+    // ... (keep other existing methods)
 }
 
 /// Response structure for client-side search requests.
