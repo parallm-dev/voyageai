@@ -1,4 +1,5 @@
 use log::{debug, info, warn};
+use log::debug;
 use std::collections::VecDeque;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
