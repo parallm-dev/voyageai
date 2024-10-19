@@ -1,3 +1,4 @@
+mod hello;
 use clap::{Arg, Command};
 use voyageai::models::rerank::{RerankModel, RerankRequest};
 use voyageai::{VoyageAiClient, VoyageConfig};
@@ -66,5 +67,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
+    hello::hello();
     Ok(())
 }
