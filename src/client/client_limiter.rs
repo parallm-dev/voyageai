@@ -9,7 +9,16 @@ use tokio::sync::Mutex;
 pub struct RateLimiter {
     embeddings_limiter: Arc<Mutex<ApiLimiter>>,
     reranking_limiter: Arc<Mutex<ApiLimiter>>,
-}
+    search_limiter: Arc<Mutex<ApiLimiter>>,
+    }
+
+    pub async fn check_search_limit(&self, tokens: u32) -> Duration {
+        self.search_limiter.lock().await.check_limit(tokens)
+    }
+
+    pub async fn update_search_usage(&self, tokens: u32) {
+        self.search_limiter.lock().await.update_usage(tokens);
+    }
 
 /// Internal structure for managing rate limits for a specific API.
 #[derive(Debug)]
@@ -27,6 +36,7 @@ impl RateLimiter {
         Self {
             embeddings_limiter: Arc::new(Mutex::new(ApiLimiter::new(300, 1_000_000))),
             reranking_limiter: Arc::new(Mutex::new(ApiLimiter::new(100, 2_000_000))),
+            search_limiter: Arc::new(Mutex::new(ApiLimiter::new(200, 1_500_000))),
         }
     }
 

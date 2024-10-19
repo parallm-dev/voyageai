@@ -6,6 +6,7 @@ use serde::Deserialize;
 pub enum Model {
     Embedding(EmbeddingModel),
     Rerank(RerankModel),
+    Search(SearchModel),
 }
 
 impl Default for Model {

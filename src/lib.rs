@@ -1,6 +1,7 @@
 pub mod builder {
     pub mod embeddings;
     pub mod voyage;
+    pub mod search;
 }
 pub mod client;
 pub mod config;
@@ -17,6 +18,7 @@ pub use errors::{VoyageBuilderError, VoyageError};
 pub use models::{
     embeddings::{EmbeddingModel, InputType},
     rerank::{RerankModel, RerankRequest, RerankResponse},
+    search::{SearchModel, SearchType},
 };
 
 /// Re-export of the `tokio` crate for convenience.

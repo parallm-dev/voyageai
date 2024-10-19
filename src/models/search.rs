@@ -11,6 +11,18 @@ pub enum SearchModel {
     Custom(String),
 }
 
+impl PartialOrd for SearchResult {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        other.score.partial_cmp(&self.score)
+    }
+}
+
+impl Ord for SearchResult {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.partial_cmp(other).unwrap_or(Ordering::Equal)
+    }
+}
+
 impl SearchModel {
     pub fn as_str(&self) -> &str {
         match self {
@@ -45,6 +57,7 @@ pub struct SearchResponse {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SearchResult {
     pub document: String,
     pub score: f32,

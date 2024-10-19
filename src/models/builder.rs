@@ -4,6 +4,8 @@ use crate::RerankRequestBuilder;
 pub struct Model {
     pub embeddings: EmbeddingsRequestBuilder,
     pub rerank: RerankRequestBuilder,
+    pub search: SearchRequestBuilder,
+    search: Option<SearchRequestBuilder>,
 }
 
 impl Model {
@@ -11,6 +13,8 @@ impl Model {
         Self {
             embeddings: EmbeddingsRequestBuilder::new(),
             rerank: RerankRequestBuilder::new(),
+            search: SearchRequestBuilder::new(),
+            search: self.search.unwrap_or_else(SearchRequestBuilder::new),
         }
     }
 
@@ -50,7 +54,10 @@ impl ModelBuilder {
         self
     }
 
-    pub fn build(self) -> Model {
+    pub fn search(mut self, builder: SearchRequestBuilder) -> Self {
+        self.search = Some(builder);
+        self
+    }
         Model {
             embeddings: self
                 .embeddings
