@@ -37,7 +37,7 @@ impl PartialOrd for SearchResult {
 impl Ord for SearchResult {
     fn cmp(&self, other: &Self) -> Ordering {
         self.score.cmp(&other.score)
-}
+    }
 
 /// Client for performing search operations.
 #[derive(Debug, Clone)]
@@ -52,7 +52,7 @@ pub struct SearchClient {
     idf_scores: HashMap<String, f32>,
     #[allow(dead_code)]
     avg_doc_length: f32,
-}
+    }
 
 impl SearchClient {
     pub fn new(embedding_client: EmbeddingClient, rerank_client: RerankClient) -> Self {
@@ -104,7 +104,7 @@ impl SearchClient {
         }
 
         Ok(results)
-}
+    }
 
 // Helper function to calculate Euclidean distance
 fn euclidean_distance(a: &[f32], b: &[f32]) -> f32 {
@@ -113,7 +113,7 @@ fn euclidean_distance(a: &[f32], b: &[f32]) -> f32 {
         .map(|(x, y)| (x - y).powi(2))
         .sum::<f32>()
         .sqrt()
-}
+    }
     }
 
     /// Performs a nearest duplicate search to find similar documents.
