@@ -45,6 +45,12 @@ impl SearchClient {
             None => return Err(VoyageError::MissingDocuments("Missing documents".to_string())),
         };
 
+        // Add error handling for unauthorized access
+        if let Err(VoyageError::Unauthorized) = query_embedding {
+            warn!("Unauthorized: Invalid API key");
+            return Err(VoyageError::Unauthorized);
+        }
+
         // Calculate distances
         let mut results = request.documents.as_ref().unwrap()
             .iter()
