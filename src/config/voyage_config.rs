@@ -16,9 +16,12 @@ impl Default for Model {
 }
 
 #[derive(Debug, Clone)]
+use crate::models::search::SearchModel;
+
 pub struct VoyageConfig {
     pub api_key: String,
     pub base_url: String,
+    pub search_model: SearchModel,
 }
 
 impl VoyageConfig {

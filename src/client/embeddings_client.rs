@@ -19,12 +19,12 @@ pub struct EmbeddingClient {
 }
 
 impl EmbeddingClient {
-    pub async fn embed(&self, text: &str) -> Result<Vec<f32>, VoyageError> {
+    pub async fn embed(&self, _text: &str) -> Result<Vec<f32>, VoyageError> {
         // Implementation for embedding a single text
         todo!("Implement embed method")
     }
 
-    pub async fn embed_batch(&self, texts: &[String]) -> Result<Vec<Vec<f32>>, VoyageError> {
+    pub async fn embed_batch(&self, _texts: &[String]) -> Result<Vec<Vec<f32>>, VoyageError> {
         // Implementation for embedding multiple texts
         todo!("Implement embed_batch method")
     }

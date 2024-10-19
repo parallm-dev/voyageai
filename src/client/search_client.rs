@@ -1,8 +1,8 @@
-use std::cmp::Ordering;
 use std::collections::{HashMap, HashSet};
 
 use crate::client::{embeddings_client::EmbeddingClient, rerank_client::RerankClient};
-use crate::models::search::{SearchRequest, SearchResult, SearchType};
+use crate::builder::search::SearchRequest;
+use crate::models::search::{SearchResult, SearchType};
 use crate::errors::VoyageError;
 
 // Define SearchRequest struct here
@@ -103,9 +103,10 @@ impl SearchClient {
             .map(|(index, (doc, doc_embedding))| {
                 let similarity = Self::cosine_similarity(&query_embedding, &doc_embedding);
                 SearchResult {
-                    document: doc.clone(),
+                    document: doc.to_string(),
                     score: similarity as i32, // Convert to i32 for consistency
                     index,
+                    search_type: SearchType::NearestDuplicate,
                 }
             })
             .collect::<Vec<_>>();
