@@ -31,12 +31,14 @@ impl PartialOrd for SearchResult {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     } // Close the partial_cmp method
+} // Add this closing brace to close the impl block
 
 
 impl Ord for SearchResult {
     fn cmp(&self, other: &Self) -> Ordering {
         self.score.cmp(&other.score)
     } // Close the Ord implementation
+} // Add this closing brace to close the impl block
 
 /// Client for performing search operations.
 #[derive(Debug, Clone)]
@@ -61,12 +63,13 @@ impl SearchClient {
             idf_scores: HashMap::new(),
             avg_doc_length: 0.0,
         }
-    }
+    } // Close the impl block for SearchClient
 
     // ... (keep existing methods)
     async fn nearest_neighbor_search(
         &self,
-        _request: &SearchRequest,
+        request: &SearchRequest, // Fix parameter name
+        request: &SearchRequest, // Fix parameter name
     ) -> Result<Vec<SearchResult>, VoyageError> {
         // Obtain embeddings for the query and documents
         let query_embedding = self.embedding_client.embed(&request.query).await?;
@@ -116,7 +119,7 @@ fn euclidean_distance(a: &[f32], b: &[f32]) -> f32 {
     #[allow(dead_code)]
     async fn nearest_duplicate_search(
         &self,
-        _request: &SearchRequest,
+        request: &SearchRequest, // Fix parameter name
     ) -> Result<Vec<SearchResult>, VoyageError> {
         // Obtain embeddings for the query and documents
         let query_embedding = self.embedding_client.embed(&request.query).await?;
