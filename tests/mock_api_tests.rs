@@ -18,7 +18,7 @@ fn setup_runtime() -> Runtime {
 
 #[tokio::test]
 async fn test_embeddings_api() -> Result<(), Box<dyn std::error::Error>> {
-    let server = mockito::Server::new();
+    let mut server = mockito::Server::new();
     let mock_url = server.url();
 
     let _m = server
@@ -69,7 +69,7 @@ async fn test_embeddings_api() -> Result<(), Box<dyn std::error::Error>> {
 
 #[tokio::test]
 async fn test_rerank_api() -> Result<(), Box<dyn std::error::Error>> {
-    let server = mockito::Server::new();
+    let mut server = mockito::Server::new();
     let mock_url = server.url();
 
     let _m = server
