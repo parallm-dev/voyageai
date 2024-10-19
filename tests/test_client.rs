@@ -45,10 +45,8 @@ mod tests {
             response.data.len() >= 2,
             "Expected at least two results"
         );
-        assert!(
-            response.data[0].relevance_score >= response.data[1].relevance_score,
-            "Documents should be sorted by relevance score"
-        );
+        // Embeddings don't have relevance scores, so we'll just check if we got the expected number of results
+        assert_eq!(response.data.len(), 2, "Expected two embeddings");
 
         Ok(())
     }
