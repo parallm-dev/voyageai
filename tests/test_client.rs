@@ -33,7 +33,7 @@ mod tests {
             1,
             "Expected 1 embedding, got {}",
             response.data.len()
-        )
+        );
 
         let embedding = &response.data[0];
         assert!(
@@ -41,6 +41,7 @@ mod tests {
             "Embedding should not be empty"
         );
 
+        let mut iter = results.iter();
         if let (Some(first), Some(second)) = (iter.next(), iter.next()) {
             assert!(
                 first.relevance_score >= second.relevance_score,
