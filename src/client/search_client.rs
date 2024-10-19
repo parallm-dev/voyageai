@@ -1,5 +1,4 @@
 use std::collections::{HashMap, HashSet};
-use log::debug;
 
 use crate::client::{embeddings_client::EmbeddingClient, rerank_client::RerankClient};
 use crate::builder::search::SearchRequest;
