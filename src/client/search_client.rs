@@ -30,6 +30,7 @@ impl SearchClient {
             avg_doc_length: 0.0,
         }
     }
+}
 
     // ... (keep existing methods)
     async fn nearest_neighbor_search(
