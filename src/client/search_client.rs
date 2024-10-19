@@ -32,13 +32,11 @@ pub struct SearchResult {
 impl PartialOrd for SearchResult {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
-    }
 }
 
 impl Ord for SearchResult {
     fn cmp(&self, other: &Self) -> Ordering {
         self.score.cmp(&other.score)
-    }
 }
 
 /// Client for performing search operations.
@@ -65,7 +63,6 @@ impl SearchClient {
             idf_scores: HashMap::new(),
             avg_doc_length: 0.0,
         }
-    }
 
     // ... (keep existing methods)
 
@@ -107,7 +104,6 @@ impl SearchClient {
         }
 
         Ok(results)
-    }
 }
 
 // Helper function to calculate Euclidean distance
