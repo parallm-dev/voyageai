@@ -80,11 +80,7 @@ impl From<serde_json::Error> for VoyageError {
     }
 }
 
-impl From<reqwest::Error> for VoyageError {
-    fn from(error: reqwest::Error) -> Self {
-        VoyageError::RequestError(error)
-    }
-}
+// Remove this implementation as it's already derived
 
 #[derive(Error, Debug)]
 pub enum VoyageBuilderError {
