@@ -66,6 +66,70 @@ async fn test_embeddings_api() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[tokio::test]
+async fn test_rerank_api() -> Result<(), Box<dyn std::error::Error>> {
+    let mut server = mockito::Server::new_async().await;
+    let mock_url = server.url();
+
+    let _m = server
+        .mock("POST", "/v1/rerank")
+        .match_header("Authorization", mockito::Matcher::Exact("Bearer test_api_key".to_string()))
+        .match_body(mockito::Matcher::Json(serde_json::json!({
+            "query": "What is the capital of France?",
+            "documents": ["Paris is the capital of France."],
+            "model": "rerank-2"
+        })))
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(
+            r#"
+            {
+                "object": "list",
+                "data": [
+                    {
+                        "relevance_score": 0.95,
+                        "index": 0
+                    }
+                ],
+                "model": "rerank-2",
+                "usage": {
+                    "total_tokens": 10
+                }
+            }
+            "#,
+        )
+        .create_async()
+        .await;
+
+    let config = VoyageConfig::new("test_api_key".to_string()).with_base_url(mock_url);
+    let client = VoyageAiClient::new(config);
+
+    let request = RerankRequest {
+        query: "What is the capital of France?".to_string(),
+        documents: vec!["Paris is the capital of France.".to_string()],
+        model: RerankModel::Rerank2,
+        top_k: None,
+    };
+
+    let response = client.rerank().rerank(&request).await?;
+
+    assert_eq!(response.data.len(), 1, "Expected exactly one result");
+    assert!(
+        response.data[0].relevance_score > 0.0 && response.data[0].relevance_score <= 1.0,
+        "Relevance score should be between 0 and 1"
+    );
+    assert_eq!(response.data[0].index, 0, "Expected index to be 0");
+
+    assert!(!response.data.is_empty(), "Expected at least one result");
+    let first_result = &response.data[0];
+    assert_eq!(first_result.relevance_score, 0.95);
+    assert_eq!(first_result.index, 0);
+    assert_eq!(response.model, "rerank-2");
+    assert_eq!(response.usage.total_tokens, 10);
+
+    Ok(())
+}
+
+#[tokio::test]
 async fn test_embed_method() -> Result<(), Box<dyn std::error::Error>> {
     let mut server = mockito::Server::new_async().await;
     let mock_url = server.url();

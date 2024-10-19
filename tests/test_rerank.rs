@@ -129,3 +129,22 @@ async fn test_rerank_invalid_input() -> Result<(), Box<dyn Error>> {
 
     Ok(())
 }
+
+#[tokio::test]
+async fn test_rerank_invalid_input() -> Result<(), Box<dyn Error>> {
+    let api_key = std::env::var("VOYAGE_API_KEY").expect("VOYAGE_API_KEY must be set");
+    let config = VoyageConfig::new(api_key);
+    let client = VoyageAiClient::new(config);
+
+    let rerank_request = RerankRequest {
+        query: "".to_string(),
+        documents: vec![],
+        model: RerankModel::Rerank2,
+        top_k: Some(2),
+    };
+
+    let result = client.rerank().rerank(&rerank_request).await;
+    assert!(result.is_err(), "Expected an error for invalid input");
+
+    Ok(())
+}
