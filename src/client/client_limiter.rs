@@ -12,11 +12,11 @@ pub struct RateLimiter {
     search_limiter: Arc<Mutex<ApiLimiter>>,
     }
 
-    pub async fn check_search_limit(&self, tokens: u32) -> Duration {
+    pub async fn check_search_limit(self: &Arc<Self>, tokens: u32) -> Duration {
         self.search_limiter.lock().await.check_limit(tokens)
     }
 
-    pub async fn update_search_usage(&self, tokens: u32) {
+    pub async fn update_search_usage(self: &Arc<Self>, tokens: u32) {
         self.search_limiter.lock().await.update_usage(tokens);
     }
 
