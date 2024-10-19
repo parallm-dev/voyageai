@@ -16,14 +16,9 @@ fn setup_runtime() -> Runtime {
         .expect("Failed to create runtime")
 }
 
-#[test]
-fn test_embeddings_api() -> Result<(), Box<dyn std::error::Error>> {
-    let rt = setup_runtime();
-    rt.block_on(test_embeddings_api_inner())
-}
-
-async fn test_embeddings_api_inner() -> Result<(), Box<dyn std::error::Error>> {
-    let mut server = mockito::Server::new();
+#[tokio::test]
+async fn test_embeddings_api() -> Result<(), Box<dyn std::error::Error>> {
+    let server = mockito::Server::new();
     let mock_url = server.url();
 
     let _m = server
@@ -72,14 +67,9 @@ async fn test_embeddings_api_inner() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-#[test]
-fn test_rerank_api() -> Result<(), Box<dyn std::error::Error>> {
-    let rt = setup_runtime();
-    rt.block_on(test_rerank_api_inner())
-}
-
-async fn test_rerank_api_inner() -> Result<(), Box<dyn std::error::Error>> {
-    let mut server = mockito::Server::new();
+#[tokio::test]
+async fn test_rerank_api() -> Result<(), Box<dyn std::error::Error>> {
+    let server = mockito::Server::new();
     let mock_url = server.url();
 
     let _m = server
