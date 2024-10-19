@@ -33,13 +33,22 @@ mod tests {
             1,
             "Expected 1 embedding, got {}",
             response.data.len()
-        );
+        )
 
         let embedding = &response.data[0];
         assert!(
             !embedding.embedding.is_empty(),
             "Embedding should not be empty"
         );
+
+        if let (Some(first), Some(second)) = (iter.next(), iter.next()) {
+            assert!(
+                first.relevance_score >= second.relevance_score,
+                "Documents should be sorted by relevance score"
+            );
+        } else {
+            panic!("Expected at least two results");
+        }
 
         Ok(())
     }
