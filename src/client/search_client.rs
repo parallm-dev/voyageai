@@ -11,8 +11,7 @@ pub struct SearchRequest {
     pub documents: Vec<String>,
     pub top_k: Option<usize>,
     pub search_type: SearchType,
-
-// Define SearchType enum here
+}
 #[derive(Debug, Clone)]
 pub enum SearchType {
     Similarity,
@@ -31,18 +30,17 @@ pub struct SearchResult {
 impl PartialOrd for SearchResult {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
-}
+    }
 
 
 impl Ord for SearchResult {
     fn cmp(&self, other: &Self) -> Ordering {
         self.score.cmp(&other.score)
-}
+    }
 
 /// Client for performing search operations.
 #[derive(Debug, Clone)]
 pub struct SearchClient {
-}
     embedding_client: EmbeddingClient,
     #[allow(dead_code)]
     rerank_client: RerankClient,
@@ -52,6 +50,7 @@ pub struct SearchClient {
     idf_scores: HashMap<String, f32>,
     #[allow(dead_code)]
     avg_doc_length: f32,
+}
 
 impl SearchClient {
     pub fn new(embedding_client: EmbeddingClient, rerank_client: RerankClient) -> Self {
@@ -64,8 +63,7 @@ impl SearchClient {
         }
 
     // ... (keep existing methods)
-}
-    #[allow(dead_code)]
+    }
     async fn nearest_neighbor_search(
         &self,
         _request: &SearchRequest,
