@@ -45,8 +45,6 @@ mod tests {
     }
 
     #[tokio::test]
-
-    #[tokio::test]
     async fn test_invalid_api_key() {
         let config = VoyageConfig::new("invalid_api_key".to_string());
         let client = VoyageAiClient::new(config);
