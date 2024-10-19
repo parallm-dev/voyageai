@@ -19,7 +19,6 @@ pub struct SearchClient {
     idf_scores: HashMap<String, f32>,
     #[allow(dead_code)]
     avg_doc_length: f32,
-}
 
 impl SearchClient {
     pub fn new(embedding_client: EmbeddingClient, rerank_client: RerankClient) -> Self {
@@ -79,7 +78,6 @@ impl SearchClient {
             .sum::<f32>()
             .sqrt()
     }
-}
 }
 
     /// Performs a nearest duplicate search to find similar documents.
