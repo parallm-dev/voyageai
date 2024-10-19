@@ -100,7 +100,7 @@ async fn test_embed_method() -> Result<(), Box<dyn std::error::Error>> {
         .await;
 
     let config = VoyageConfig::new("test_api_key".to_string()).with_base_url(mock_url);
-    let rate_limiter = Arc::new(RateLimiter::new());
+    let _rate_limiter = Arc::new(RateLimiter::new());
     let client = VoyageAiClient::new(config.clone());
     let embedding_client = client.embeddings();
 

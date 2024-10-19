@@ -1,5 +1,5 @@
 use env_logger::Builder;
-use log::{info, LevelFilter};
+use log::{debug, info, LevelFilter};
 use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
 use std::io::Write;
 use voyageai::builder::embeddings::EmbeddingsRequestBuilder;
@@ -122,7 +122,7 @@ async fn test_voyage_ai_client() {
             info!("Rerank model used: {}", rerank_response.model);
             info!("Rerank tokens used: {}", rerank_response.usage.total_tokens);
         }
-        Err(VoyageError::JsonError(err)) => {
+        Err(voyageai::VoyageError::JsonError(err)) => {
             panic!("JSON error in rerank response: {:?}", err);
         }
         Err(err) => {
