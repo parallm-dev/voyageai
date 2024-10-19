@@ -7,6 +7,8 @@ use voyageai::{
     },
     VoyageAiClient, VoyageConfig,
 };
+use std::sync::Arc;
+use voyageai::client::RateLimiter;
 
 #[tokio::test]
 async fn test_embeddings_api() -> Result<(), Box<dyn std::error::Error>> {
@@ -60,6 +62,103 @@ async fn test_embeddings_api() -> Result<(), Box<dyn std::error::Error>> {
     assert_eq!(response.data[0].index, 0);
     assert_eq!(response.model, "voyage-3");
     assert_eq!(response.usage.total_tokens, 5);
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_embed_method() -> Result<(), Box<dyn std::error::Error>> {
+    let mut server = mockito::Server::new_async().await;
+    let mock_url = server.url();
+
+    let _m = server
+        .mock("POST", "/v1/embeddings")
+        .match_body(mockito::Matcher::Json(serde_json::json!({
+            "input": ["Test input"],
+            "model": "voyage-3"
+        })))
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(
+            r#"
+            {
+                "object": "list",
+                "data": [
+                    {
+                        "object": "embedding",
+                        "embedding": [0.1, 0.2, 0.3],
+                        "index": 0
+                    }
+                ],
+                "model": "voyage-3",
+                "usage": {
+                    "total_tokens": 5
+                }
+            }
+            "#,
+        )
+        .create_async()
+        .await;
+
+    let config = VoyageConfig::new("test_api_key".to_string()).with_base_url(mock_url);
+    let rate_limiter = Arc::new(RateLimiter::new());
+    let client = VoyageAiClient::new(config.clone());
+    let embedding_client = client.embeddings();
+
+    let result = embedding_client.embed("Test input").await?;
+
+    assert_eq!(result, vec![0.1, 0.2, 0.3]);
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_embed_batch_method() -> Result<(), Box<dyn std::error::Error>> {
+    let mut server = mockito::Server::new_async().await;
+    let mock_url = server.url();
+
+    let _m = server
+        .mock("POST", "/v1/embeddings")
+        .match_body(mockito::Matcher::Json(serde_json::json!({
+            "input": ["Test input 1", "Test input 2"],
+            "model": "voyage-3"
+        })))
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(
+            r#"
+            {
+                "object": "list",
+                "data": [
+                    {
+                        "object": "embedding",
+                        "embedding": [0.1, 0.2, 0.3],
+                        "index": 0
+                    },
+                    {
+                        "object": "embedding",
+                        "embedding": [0.4, 0.5, 0.6],
+                        "index": 1
+                    }
+                ],
+                "model": "voyage-3",
+                "usage": {
+                    "total_tokens": 10
+                }
+            }
+            "#,
+        )
+        .create_async()
+        .await;
+
+    let config = VoyageConfig::new("test_api_key".to_string()).with_base_url(mock_url);
+    let rate_limiter = Arc::new(RateLimiter::new());
+    let client = VoyageAiClient::new(config.clone());
+    let embedding_client = client.embeddings();
+
+    let result = embedding_client.embed_batch(&["Test input 1".to_string(), "Test input 2".to_string()]).await?;
+
+    assert_eq!(result, vec![vec![0.1, 0.2, 0.3], vec![0.4, 0.5, 0.6]]);
 
     Ok(())
 }

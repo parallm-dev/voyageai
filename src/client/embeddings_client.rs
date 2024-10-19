@@ -19,14 +19,22 @@ pub struct EmbeddingClient {
 }
 
 impl EmbeddingClient {
-    pub async fn embed(&self, _text: &str) -> Result<Vec<f32>, VoyageError> {
-        // Implementation for embedding a single text
-        todo!("Implement embed method")
+    pub async fn embed(&self, text: &str) -> Result<Vec<f32>, VoyageError> {
+        let request = EmbeddingsRequest {
+            input: vec![text.to_string()],
+            model: self.config.embedding_model.clone(),
+        };
+        let response = self.create_embedding(&request).await?;
+        Ok(response.data[0].embedding.clone())
     }
 
-    pub async fn embed_batch(&self, _texts: &[String]) -> Result<Vec<Vec<f32>>, VoyageError> {
-        // Implementation for embedding multiple texts
-        todo!("Implement embed_batch method")
+    pub async fn embed_batch(&self, texts: &[String]) -> Result<Vec<Vec<f32>>, VoyageError> {
+        let request = EmbeddingsRequest {
+            input: texts.to_vec(),
+            model: self.config.embedding_model.clone(),
+        };
+        let response = self.create_embedding(&request).await?;
+        Ok(response.data.into_iter().map(|d| d.embedding).collect())
     }
 }
 
