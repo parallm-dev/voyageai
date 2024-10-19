@@ -252,7 +252,6 @@ fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
 
         score
     }
-}
 
 // Tokenization helper function
 fn tokenize(text: &str) -> Vec<&str> {
