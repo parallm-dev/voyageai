@@ -12,12 +12,12 @@ pub struct RateLimiter {
     search_limiter: Arc<Mutex<ApiLimiter>>,
     }
 
-    pub async fn check_search_limit(tokens: u32) -> Duration {
-        ApiLimiter::check_limit(tokens)
+    pub async fn check_search_limit(&self, tokens: u32) -> Duration {
+        self.search_limiter.lock().await.check_limit(tokens)
     }
 
-    pub async fn update_search_usage(tokens: u32) {
-        ApiLimiter::update_usage(tokens);
+    pub async fn update_search_usage(&self, tokens: u32) {
+        self.search_limiter.lock().await.update_usage(tokens);
     }
 
 /// Internal structure for managing rate limits for a specific API.
