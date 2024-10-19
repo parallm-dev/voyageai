@@ -1,11 +1,11 @@
 use crate::errors::VoyageBuilderError;
 use crate::models::search::{SearchModel, SearchQuery};
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 
 /// Builder for creating a search request.
 #[derive(Debug, Default)]
 pub struct SearchRequestBuilder {
-    query: Option<SearchQuery>,
+    query: Option<String>,
     documents: Option<Vec<String>>,
     embeddings: Option<Vec<Vec<f32>>>,
     model: Option<SearchModel>,
@@ -20,8 +20,8 @@ impl SearchRequestBuilder {
     }
 
     /// Sets the query for the search request.
-    pub fn query(mut self, query: SearchQuery) -> Self {
-        self.query = Some(query);
+    pub fn query(mut self, query: impl Into<String>) -> Self {
+        self.query = Some(query.into());
         self
     }
 
@@ -61,12 +61,10 @@ impl SearchRequestBuilder {
 
     /// Builds the `SearchRequest` from the builder.
     pub fn build(self) -> Result<SearchRequest, VoyageBuilderError> {
-        let query = self
-            .query
+        let query = self.query
             .ok_or(VoyageBuilderError::MissingField("query".to_string()))?;
         let model = self.model.ok_or(VoyageBuilderError::MissingModel)?;
-        let search_type = self
-            .search_type
+        let search_type = self.search_type
             .ok_or(VoyageBuilderError::MissingField("search_type".to_string()))?;
 
         if self.documents.is_none() && self.embeddings.is_none() {
@@ -76,7 +74,11 @@ impl SearchRequestBuilder {
         }
 
         Ok(SearchRequest {
-            query,
+            query: SearchQuery {
+                query,
+                model: model.clone(),
+                max_results: self.top_k,
+            },
             documents: self.documents,
             embeddings: self.embeddings,
             model,
@@ -87,7 +89,7 @@ impl SearchRequestBuilder {
 }
 
 /// Represents a search request to be sent to the API.
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SearchRequest {
     /// The query to search against.
     pub query: SearchQuery,
@@ -107,7 +109,7 @@ pub struct SearchRequest {
 }
 
 /// Enum representing different types of search.
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum SearchType {
     #[serde(rename = "similarity")]
     Similarity,
