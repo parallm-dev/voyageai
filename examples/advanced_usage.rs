@@ -131,6 +131,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Demonstrate rate limiting
     println!("\nDemonstrating rate limiting...");
 
+    Ok(())
+}
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // ... (previous code remains unchanged)
+
     for i in 1..=10 {
         let start = std::time::Instant::now();
         let request = match EmbeddingsRequestBuilder::new()
