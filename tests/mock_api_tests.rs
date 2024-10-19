@@ -15,7 +15,7 @@ async fn test_embeddings_api() -> Result<(), Box<dyn std::error::Error>> {
 
     let _m = server
         .mock("POST", "/v1/embeddings")
-        .match_header("Authorization", mockito::Matcher::Regex("Bearer .+".to_string()))
+        .match_header("Authorization", "Bearer test_api_key")
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body(
@@ -68,7 +68,7 @@ async fn test_rerank_api() -> Result<(), Box<dyn std::error::Error>> {
 
     let _m = server
         .mock("POST", "/v1/rerank")
-        .match_header("Authorization", mockito::Matcher::Regex("Bearer .+".to_string()))
+        .match_header("Authorization", "Bearer test_api_key")
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body(
