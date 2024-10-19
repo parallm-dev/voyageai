@@ -102,7 +102,7 @@ impl SearchClient {
             .map(|(index, (doc, doc_embedding))| {
                 let similarity = Self::cosine_similarity(&query_embedding, &doc_embedding);
                 SearchResult {
-                    document: doc.to_string(),
+                    document: doc.clone(),
                     score: similarity as i32, // Convert to i32 for consistency
                     index,
                     search_type: SearchType::NearestDuplicate,
