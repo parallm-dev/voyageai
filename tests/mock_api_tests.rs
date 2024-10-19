@@ -7,21 +7,23 @@ use voyageai::{
     },
     VoyageAiClient, VoyageConfig,
 };
+use tokio::runtime::Runtime;
+
+fn setup_runtime() -> Runtime {
+    tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()
+        .expect("Failed to create runtime")
+}
 
 #[test]
 fn test_embeddings_api() -> Result<(), Box<dyn std::error::Error>> {
-    let rt = tokio::runtime::Runtime::new()?;
-    rt.block_on(async {
-        let mut server = mockito::Server::new();
-        rt.block_on(async {
-            test_embeddings_api_inner(&mut server).await
-        })
-    })
+    let rt = setup_runtime();
+    rt.block_on(test_embeddings_api_inner())
 }
 
-async fn test_embeddings_api_inner(
-    server: &mut mockito::Server,
-) -> Result<(), Box<dyn std::error::Error>> {
+async fn test_embeddings_api_inner() -> Result<(), Box<dyn std::error::Error>> {
+    let mut server = mockito::Server::new();
     let mock_url = server.url();
 
     let _m = server
@@ -49,14 +51,7 @@ async fn test_embeddings_api_inner(
         .create();
 
     let config = VoyageConfig::new("test_api_key".to_string()).with_base_url(mock_url);
-
-    fn setup_test_runtime() -> tokio::runtime::Runtime {
-        tokio::runtime::Runtime::new().expect("Failed to create runtime")
-    }
-
-    let _rt = setup_test_runtime();
-
-    let client = tokio::task::block_in_place(|| VoyageAiClient::new(config));
+    let client = VoyageAiClient::new(config);
 
     let request = EmbeddingsRequestBuilder::new()
         .input("Test input")
@@ -74,27 +69,17 @@ async fn test_embeddings_api_inner(
     assert_eq!(response.model, "voyage-3");
     assert_eq!(response.usage.total_tokens, 5);
 
-    assert_eq!(response.object, "list");
-    assert_eq!(response.data.len(), 1);
-    assert_eq!(response.data[0].embedding, vec![0.1, 0.2, 0.3]);
-    assert_eq!(response.model, "voyage-3");
-    assert_eq!(response.usage.total_tokens, 5);
-
     Ok(())
 }
 
 #[test]
 fn test_rerank_api() -> Result<(), Box<dyn std::error::Error>> {
-    let rt = tokio::runtime::Runtime::new()?;
-    rt.block_on(async {
-        let mut server = mockito::Server::new();
-        rt.block_on(async {
-            test_rerank_api_inner(&mut server).await
-        })
-    })
+    let rt = setup_runtime();
+    rt.block_on(test_rerank_api_inner())
 }
 
-async fn test_rerank_api_inner(server: &mut mockito::Server) -> Result<(), Box<dyn std::error::Error>> {
+async fn test_rerank_api_inner() -> Result<(), Box<dyn std::error::Error>> {
+    let mut server = mockito::Server::new();
     let mock_url = server.url();
 
     let _m = server
