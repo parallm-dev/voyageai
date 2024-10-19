@@ -30,13 +30,13 @@ pub struct SearchResult {
 impl PartialOrd for SearchResult {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
-    }
+    } // Close the partial_cmp method
 
 
 impl Ord for SearchResult {
     fn cmp(&self, other: &Self) -> Ordering {
         self.score.cmp(&other.score)
-    }
+    } // Close the Ord implementation
 
 /// Client for performing search operations.
 #[derive(Debug, Clone)]
