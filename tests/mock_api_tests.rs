@@ -51,8 +51,7 @@ async fn test_embeddings_api() -> Result<(), Box<dyn std::error::Error>> {
     let request = EmbeddingsRequestBuilder::new()
         .input("Test input")
         .model(EmbeddingModel::Voyage3)
-        .build()
-        .unwrap();
+        .build()?;
 
     let response = client.embeddings().create_embedding(&request).await?;
 
