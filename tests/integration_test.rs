@@ -1,5 +1,5 @@
 use env_logger::Builder;
-use log::{debug, info, LevelFilter};
+use log::{info, LevelFilter};
 use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
 use std::io::Write;
 use voyageai::builder::embeddings::EmbeddingsRequestBuilder;

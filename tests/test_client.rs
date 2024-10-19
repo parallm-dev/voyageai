@@ -13,7 +13,6 @@ mod tests {
         assert_eq!(config.api_key(), &api_key, "API key should match");
     }
 
-    #[tokio::test]
     async fn test_embeddings() -> Result<(), Box<dyn Error>> {
         let api_key = std::env::var("VOYAGE_API_KEY").expect("VOYAGE_API_KEY must be set");
         let config = VoyageConfig::new(api_key);
