@@ -35,6 +35,7 @@ async fn test_embeddings_api() -> Result<(), Box<dyn std::error::Error>> {
             }
             "#,
         )
+        .expect(1)
         .create_async()
         .await;
 
@@ -71,6 +72,7 @@ async fn test_rerank_api() -> Result<(), Box<dyn std::error::Error>> {
         .with_body(
             r#"
             {
+                "object": "list",
                 "data": [
                     {
                         "relevance_score": 0.95,
@@ -84,6 +86,7 @@ async fn test_rerank_api() -> Result<(), Box<dyn std::error::Error>> {
             }
             "#,
         )
+        .expect(1)
         .create_async()
         .await;
 
