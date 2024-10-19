@@ -17,7 +17,6 @@ fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use mockito;
 
     pub fn setup_mock_server() -> mockito::ServerGuard {
         let mut server = mockito::Server::new();
@@ -64,7 +63,7 @@ mod tests {
         let config = VoyageConfig::new("mock_api_key".to_string()).with_base_url(mock_server.url());
         let client = VoyageAiClient::new(config);
 
-        let texts = vec![
+        let texts = [
             "The quick brown fox jumps over the lazy dog",
             "A fast auburn canine leaps above an idle hound",
             "The sky is blue",

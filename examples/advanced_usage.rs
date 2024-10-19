@@ -161,5 +161,35 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
+    for i in 1..=10 {
+        let start = std::time::Instant::now();
+        let request = match EmbeddingsRequestBuilder::new()
+            .input(format!("Test input {}", i))
+            .model(EmbeddingModel::Voyage3)
+            .build()
+        {
+            Ok(req) => req,
+            Err(e) => {
+                eprintln!("Error building request: {:?}", e);
+                continue;
+            }
+        };
+
+        let result = client.embeddings().create_embedding(&request).await;
+        let duration = start.elapsed();
+
+        match result {
+            Ok(_) => println!("Request {} completed in {:?}", i, duration),
+            Err(VoyageError::RateLimitExceeded { reset_in }) => {
+                println!(
+                    "Rate limit reached on request {}. Reset in {:?}",
+                    i, reset_in
+                );
+                tokio::time::sleep(reset_in).await;
+            }
+            Err(e) => eprintln!("Error on request {}: {:?}", i, e),
+        }
+    }
+
     Ok(())
 }

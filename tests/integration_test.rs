@@ -1,11 +1,11 @@
 use env_logger::Builder;
-use log::{debug, info, LevelFilter};
+use log::{info, LevelFilter};
 use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
 use std::io::Write;
 use voyageai::builder::embeddings::EmbeddingsRequestBuilder;
 use voyageai::models::embeddings::{EmbeddingModel, EmbeddingsInput};
 use voyageai::models::rerank::{RerankModel, RerankRequest};
-use voyageai::{InputType, VoyageAiClient, VoyageConfig, VoyageError};
+use voyageai::{InputType, VoyageAiClient, VoyageConfig};
 
 #[tokio::test]
 async fn test_voyage_ai_client() {

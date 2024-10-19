@@ -8,7 +8,7 @@ async fn test_embedding() {
     let config = VoyageConfig::new(api_key);
     let client = VoyageAiClient::new(config);
 
-    let inputs = vec![
+    let inputs = [
         "This is the first test sentence.",
         "Here's another sentence to embed.",
         "And one final sentence for good measure.",

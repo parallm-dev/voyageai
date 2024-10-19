@@ -1,4 +1,3 @@
-use mockito;
 use voyageai::{
     builder::embeddings::EmbeddingsRequestBuilder,
     models::{
