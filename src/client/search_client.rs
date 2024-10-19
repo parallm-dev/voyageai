@@ -61,9 +61,9 @@ impl SearchClient {
             idf_scores: HashMap::new(),
             avg_doc_length: 0.0,
         }
+    }
 
     // ... (keep existing methods)
-    }
     async fn nearest_neighbor_search(
         &self,
         _request: &SearchRequest,
