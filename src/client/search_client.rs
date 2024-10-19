@@ -31,6 +31,7 @@ impl SearchClient {
         }
     }
 }
+}
 
     // ... (keep existing methods)
     async fn nearest_neighbor_search(
