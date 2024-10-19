@@ -47,7 +47,7 @@ pub struct SearchResponse {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SearchResult {
     pub document: String,
-    pub score: i32, // Changed to i32 for consistency
+    pub score: i32,
     pub index: usize,
     pub search_type: SearchType,
 }
