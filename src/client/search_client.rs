@@ -257,7 +257,8 @@ fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
 fn tokenize(text: &str) -> Vec<&str> {
     text.split_whitespace().collect()
 }
-    // ... (keep other existing methods)
+
+// ... (keep other existing methods)
 }
 
 /// Response structure for client-side search requests.
