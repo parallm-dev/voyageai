@@ -1,4 +1,5 @@
 use std::collections::{HashMap, HashSet};
+use log::{debug, info, warn};
 
 use crate::client::{embeddings_client::EmbeddingClient, rerank_client::RerankClient};
 use crate::builder::search::SearchRequest;
@@ -39,17 +40,13 @@ impl SearchClient {
         request: &SearchRequest,
     ) -> Result<Vec<SearchResult>, VoyageError> {
         // Obtain embeddings for the query and documents
-        let query_embedding: Vec<f32> = self.embedding_client.embed(&request.query.query).await?;
-        let document_embeddings: Vec<Vec<f32>> = match &request.documents {
+        let query_embedding = self.embedding_client.embed(&request.query.query).await?;
+        let document_embeddings = match &request.documents {
             Some(docs) => self.embedding_client.embed_batch(docs).await?,
             None => return Err(VoyageError::MissingDocuments("Missing documents".to_string())),
         };
 
-        // Add error handling for unauthorized access
-        if let Err(VoyageError::Unauthorized) = query_embedding {
-            warn!("Unauthorized: Invalid API key");
-            return Err(VoyageError::Unauthorized);
-        }
+        // Error handling for unauthorized access is now handled by the embed and embed_batch methods
 
         // Calculate distances
         let mut results = request.documents.as_ref().unwrap()
