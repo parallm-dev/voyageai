@@ -11,7 +11,6 @@ pub struct SearchRequest {
     pub documents: Vec<String>,
     pub top_k: Option<usize>,
     pub search_type: SearchType,
-    }
 }
 }
 
@@ -35,6 +34,9 @@ impl PartialOrd for SearchResult {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
+
+    }
+}
 
 impl Ord for SearchResult {
     fn cmp(&self, other: &Self) -> Ordering {
@@ -67,8 +69,7 @@ impl SearchClient {
         }
 
     // ... (keep existing methods)
-
-    /// Performs a nearest neighbor search based on Euclidean distance.
+}
     #[allow(dead_code)]
     async fn nearest_neighbor_search(
         &self,
@@ -264,8 +265,6 @@ fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
 fn tokenize(text: &str) -> Vec<&str> {
     text.split_whitespace().collect()
 }
-    }
-
     // ... (keep other existing methods)
 }
 
