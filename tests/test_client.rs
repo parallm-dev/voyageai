@@ -46,6 +46,42 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_reranking() -> Result<(), Box<dyn Error>> {
+        let api_key = std::env::var("VOYAGE_API_KEY").expect("VOYAGE_API_KEY must be set");
+        let config = VoyageConfig::new(api_key);
+        let client = VoyageAiClient::new(config);
+
+        let rerank_request = RerankRequest {
+            query: "test query".to_string(),
+            documents: vec!["doc1".to_string(), "doc2".to_string()],
+            model: RerankModel::Rerank2,
+            top_k: Some(2),
+        };
+
+        let response = client.rerank().rerank(&rerank_request).await?;
+
+        let results = response.data;
+
+        assert!(
+            results.len() >= 2,
+            "Expected at least 2 reranked documents, got {}",
+            results.len()
+        );
+
+        let mut iter = results.iter();
+        if let (Some(first), Some(second)) = (iter.next(), iter.next()) {
+            assert!(
+                first.relevance_score >= second.relevance_score,
+                "Documents should be sorted by relevance score"
+            );
+        } else {
+            panic!("Expected at least two results");
+        }
+
+        Ok(())
+    }
+
+    #[tokio::test]
     async fn test_invalid_api_key() {
         let config = VoyageConfig::new("invalid_api_key".to_string());
         let client = VoyageAiClient::new(config);
