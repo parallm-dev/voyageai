@@ -1,4 +1,5 @@
 use mockito;
+use tokio::runtime::Runtime;
 use voyageai::{
     builder::embeddings::EmbeddingsRequestBuilder,
     models::{
@@ -7,7 +8,6 @@ use voyageai::{
     },
     VoyageAiClient, VoyageConfig,
 };
-use tokio::runtime::Runtime;
 
 fn setup_runtime() -> Runtime {
     tokio::runtime::Builder::new_multi_thread()
