@@ -19,6 +19,7 @@ pub struct SearchClient {
     idf_scores: HashMap<String, f32>,
     #[allow(dead_code)]
     avg_doc_length: f32,
+}
 
 impl SearchClient {
     pub fn new(embedding_client: EmbeddingClient, rerank_client: RerankClient) -> Self {
@@ -29,7 +30,6 @@ impl SearchClient {
             idf_scores: HashMap::new(),
             avg_doc_length: 0.0,
         }
-    }
     }
 
     // ... (keep existing methods)
@@ -224,8 +224,6 @@ fn compute_bm25_score(&self, document: &str, query_terms: &[&str]) -> f32 {
 // Tokenization helper function
 fn tokenize(text: &str) -> Vec<&str> {
     text.split_whitespace().collect()
-}
-
 }
 
 /// Response structure for client-side search requests.
