@@ -1,5 +1,4 @@
 use mockito;
-use tokio::runtime::Runtime;
 use voyageai::{
     builder::embeddings::EmbeddingsRequestBuilder,
     models::{
@@ -9,16 +8,9 @@ use voyageai::{
     VoyageAiClient, VoyageConfig,
 };
 
-fn setup_runtime() -> Runtime {
-    tokio::runtime::Builder::new_multi_thread()
-        .enable_all()
-        .build()
-        .expect("Failed to create runtime")
-}
-
 #[tokio::test]
 async fn test_embeddings_api() -> Result<(), Box<dyn std::error::Error>> {
-    let mut server = mockito::Server::new();
+    let server = mockito::Server::new_async().await;
     let mock_url = server.url();
 
     let _m = server
@@ -43,7 +35,8 @@ async fn test_embeddings_api() -> Result<(), Box<dyn std::error::Error>> {
             }
             "#,
         )
-        .create();
+        .create_async()
+        .await;
 
     let config = VoyageConfig::new("test_api_key".to_string()).with_base_url(mock_url);
     let client = VoyageAiClient::new(config);
@@ -68,7 +61,7 @@ async fn test_embeddings_api() -> Result<(), Box<dyn std::error::Error>> {
 
 #[tokio::test]
 async fn test_rerank_api() -> Result<(), Box<dyn std::error::Error>> {
-    let mut server = mockito::Server::new();
+    let server = mockito::Server::new_async().await;
     let mock_url = server.url();
 
     let _m = server
@@ -91,7 +84,8 @@ async fn test_rerank_api() -> Result<(), Box<dyn std::error::Error>> {
             }
             "#,
         )
-        .create();
+        .create_async()
+        .await;
 
     let config = VoyageConfig::new("test_api_key".to_string()).with_base_url(mock_url);
     let client = VoyageAiClient::new(config);
