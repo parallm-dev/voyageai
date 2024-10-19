@@ -45,8 +45,6 @@ impl SearchClient {
             None => return Err(VoyageError::MissingDocuments("Missing documents".to_string())),
         };
 
-        // Error handling for unauthorized access is now handled by the embed and embed_batch methods
-
         // Calculate distances
         let mut results = request.documents.as_ref().unwrap()
             .iter()
