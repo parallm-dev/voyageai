@@ -19,24 +19,23 @@ pub enum SearchType {
     NearestNeighbor,
     NearestDuplicate,
     BM25,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SearchResult {
     pub document: String,
     pub score: i32, // Changed from f32 to i32 for Ord implementation
     pub index: usize,
+}
 
 impl PartialOrd for SearchResult {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
-    }
 
-    }
 
 impl Ord for SearchResult {
     fn cmp(&self, other: &Self) -> Ordering {
         self.score.cmp(&other.score)
-    }
 
 /// Client for performing search operations.
 #[derive(Debug, Clone)]
@@ -51,7 +50,6 @@ pub struct SearchClient {
     idf_scores: HashMap<String, f32>,
     #[allow(dead_code)]
     avg_doc_length: f32,
-    }
 
 impl SearchClient {
     pub fn new(embedding_client: EmbeddingClient, rerank_client: RerankClient) -> Self {
