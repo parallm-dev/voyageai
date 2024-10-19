@@ -76,27 +76,34 @@ impl EmbeddingClient {
         let status = response.status();
         let text = response.text().await?;
 
-        if status.is_success() {
-            debug!("Embedding request successful");
-            let mut embeddings_response: EmbeddingsResponse = serde_json::from_str(&text)?;
-            
-            // Ensure the 'data' field is populated
-            if embeddings_response.data.is_empty() {
-                embeddings_response.data = vec![EmbeddingData {
-                    object: "embedding".to_string(),
-                    embedding: vec![0.0],
-                    index: 0,
-                }];
+        match status {
+            reqwest::StatusCode::OK => {
+                debug!("Embedding request successful");
+                let mut embeddings_response: EmbeddingsResponse = serde_json::from_str(&text)?;
+                
+                // Ensure the 'data' field is populated
+                if embeddings_response.data.is_empty() {
+                    embeddings_response.data = vec![EmbeddingData {
+                        object: "embedding".to_string(),
+                        embedding: vec![0.0],
+                        index: 0,
+                    }];
+                }
+
+                self.rate_limiter
+                    .update_embeddings_usage(embeddings_response.usage.total_tokens)
+                    .await;
+
+                Ok(embeddings_response)
             }
-
-            self.rate_limiter
-                .update_embeddings_usage(embeddings_response.usage.total_tokens)
-                .await;
-
-            Ok(embeddings_response)
-        } else {
-            warn!("Embedding request failed with status: {}", status);
-            Err(VoyageError::ApiError(status, text))
+            reqwest::StatusCode::UNAUTHORIZED => {
+                warn!("Unauthorized: Invalid API key");
+                Err(VoyageError::Unauthorized)
+            }
+            _ => {
+                warn!("Embedding request failed with status: {}", status);
+                Err(VoyageError::ApiError(status, text))
+            }
         }
     }
 
