@@ -68,7 +68,6 @@ pub enum EncodingFormat {
 
 /// Supported embedding models by VoyageAI
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum EmbeddingModel {
     #[serde(rename = "voyage-3")]
     Voyage3,

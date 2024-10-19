@@ -1,4 +1,4 @@
-use crate::models::embeddings::{EmbeddingsRequest, EmbeddingsResponse, EmbeddingData, EmbeddingsInput, EmbeddingModel};
+use crate::models::embeddings::{EmbeddingsRequest, EmbeddingsResponse, EmbeddingData, EmbeddingsInput};
 use crate::client::RateLimiter;
 use crate::config::VoyageConfig;
 use crate::errors::VoyageError;
@@ -34,7 +34,7 @@ impl EmbeddingClient {
     pub async fn embed_batch(&self, texts: &[String]) -> Result<Vec<Vec<f32>>, VoyageError> {
         let request = EmbeddingsRequest {
             input: EmbeddingsInput::Multiple(texts.to_vec()),
-            model: self.config.search_model.clone(),
+            model: self.config.embedding_model.clone(),
             input_type: None,
             truncation: None,
             encoding_format: None,
