@@ -56,7 +56,6 @@ impl ModelBuilder {
     pub fn search(mut self, builder: SearchRequestBuilder) -> Self {
         self.search = Some(builder);
         self
-        self
     }
 
     pub fn build(self) -> Model {
