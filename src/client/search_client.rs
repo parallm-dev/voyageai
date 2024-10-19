@@ -152,7 +152,7 @@ impl SearchClient {
             .map(|(index, doc)| {
                 let score = self.compute_bm25_score(doc, &query_terms);
                 SearchResult {
-                    document: doc.to_string(),
+                    document: vec![doc.to_string()],
                     score: score as i32, // Convert to i32 for consistency
                     index,
                     search_type: SearchType::BM25,
