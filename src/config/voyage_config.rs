@@ -1,4 +1,4 @@
-use crate::models::{EmbeddingModel, RerankModel, search::SearchModel};
+use crate::models::{embeddings::EmbeddingModel, RerankModel, search::SearchModel};
 use serde::Deserialize;
 
 #[allow(dead_code)]

@@ -68,6 +68,7 @@ pub enum EncodingFormat {
 
 /// Supported embedding models by VoyageAI
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum EmbeddingModel {
     #[serde(rename = "voyage-3")]
     Voyage3,
@@ -79,6 +80,12 @@ pub enum EmbeddingModel {
     VoyageMultilingual2,
     #[serde(rename = "voyage-law-2")]
     VoyageLaw2,
+}
+
+impl Default for EmbeddingModel {
+    fn default() -> Self {
+        EmbeddingModel::Voyage3
+    }
 }
 
 impl EmbeddingModel {
