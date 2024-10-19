@@ -11,7 +11,7 @@ pub struct SearchRequest {
     pub documents: Vec<String>,
     pub top_k: Option<usize>,
     pub search_type: SearchType,
-}
+    }
 
 // Define SearchType enum here
 #[derive(Debug, Clone)]
@@ -20,19 +20,19 @@ pub enum SearchType {
     NearestNeighbor,
     NearestDuplicate,
     BM25,
-}
+    }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SearchResult {
     pub document: String,
     pub score: i32, // Changed from f32 to i32 for Ord implementation
     pub index: usize,
-}
+    }
 
 impl PartialOrd for SearchResult {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
-}
+    }
 
 impl Ord for SearchResult {
     fn cmp(&self, other: &Self) -> Ordering {
