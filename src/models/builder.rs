@@ -69,4 +69,4 @@ impl ModelBuilder {
 }
 
 pub use crate::models::embeddings::EmbeddingModel as Embedding;
-pub use crate::models::rerank::RerankModel as ReRank;
+pub use crate::models::rerank::RerankModel as Rerank;
