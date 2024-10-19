@@ -127,3 +127,67 @@ async fn test_rerank_api() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use voyageai::errors::VoyageError;
+
+    #[tokio::test]
+    async fn test_embeddings_api_unauthorized() -> Result<(), Box<dyn std::error::Error>> {
+        let mut server = mockito::Server::new_async().await;
+        let mock_url = server.url();
+
+        let _m = server
+            .mock("POST", "/v1/embeddings")
+            .with_status(401)
+            .with_header("content-type", "application/json")
+            .with_body(r#"{"detail":"Provided API key is invalid."}"#)
+            .create_async()
+            .await;
+
+        let config = VoyageConfig::new("invalid_api_key".to_string()).with_base_url(mock_url);
+        let client = VoyageAiClient::new(config);
+
+        let request = EmbeddingsRequestBuilder::new()
+            .input("Test input")
+            .model(EmbeddingModel::Voyage3)
+            .build()?;
+
+        let result = client.embeddings().create_embedding(&request).await;
+
+        assert!(matches!(result, Err(VoyageError::Unauthorized)));
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_rerank_api_unauthorized() -> Result<(), Box<dyn std::error::Error>> {
+        let mut server = mockito::Server::new_async().await;
+        let mock_url = server.url();
+
+        let _m = server
+            .mock("POST", "/v1/rerank")
+            .with_status(401)
+            .with_header("content-type", "application/json")
+            .with_body(r#"{"detail":"Provided API key is invalid."}"#)
+            .create_async()
+            .await;
+
+        let config = VoyageConfig::new("invalid_api_key".to_string()).with_base_url(mock_url);
+        let client = VoyageAiClient::new(config);
+
+        let request = RerankRequest {
+            query: "What is the capital of France?".to_string(),
+            documents: vec!["Paris is the capital of France.".to_string()],
+            model: RerankModel::Rerank2,
+            top_k: None,
+        };
+
+        let result = client.rerank().rerank(&request).await;
+
+        assert!(matches!(result, Err(VoyageError::Unauthorized)));
+
+        Ok(())
+    }
+}

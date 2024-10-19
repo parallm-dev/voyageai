@@ -100,6 +100,10 @@ impl EmbeddingClient {
                 warn!("Unauthorized: Invalid API key");
                 Err(VoyageError::Unauthorized)
             }
+            reqwest::StatusCode::FORBIDDEN => {
+                warn!("Forbidden: {}", text);
+                Err(VoyageError::Forbidden(text))
+            }
             _ => {
                 warn!("Embedding request failed with status: {}", status);
                 Err(VoyageError::ApiError(status, text))
