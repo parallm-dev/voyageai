@@ -41,7 +41,7 @@ impl SearchClient {
         let query_embedding: Vec<f32> = self.embedding_client.embed(&request.query.query).await?;
         let document_embeddings: Vec<Vec<f32>> = match &request.documents {
             Some(docs) => self.embedding_client.embed_batch(docs).await?,
-            None => return Err(VoyageError::InvalidRequest("Missing documents".to_string())),
+            None => return Err(VoyageError::MissingDocuments("Missing documents".to_string())),
         };
 
         // Calculate distances
@@ -87,7 +87,7 @@ impl SearchClient {
         request: &SearchRequest,
     ) -> Result<Vec<SearchResult>, VoyageError> {
         // Obtain embeddings for the query and documents
-        let query_embedding = self.embedding_client.embed(&request.query).await?;
+        let query_embedding = self.embedding_client.embed(&request.query.query).await?;
         let document_embeddings = self
             .embedding_client
             .embed_batch(request.documents.as_ref().unwrap())
@@ -102,7 +102,7 @@ impl SearchClient {
             .map(|(index, (doc, doc_embedding))| {
                 let similarity = Self::cosine_similarity(&query_embedding, &doc_embedding);
                 SearchResult {
-                    document: doc.clone(),
+                    document: doc.to_string(),
                     score: similarity as i32, // Convert to i32 for consistency
                     index,
                     search_type: SearchType::NearestDuplicate,
@@ -135,7 +135,7 @@ impl SearchClient {
         &mut self,
         request: &SearchRequest,
     ) -> Result<Vec<SearchResult>, VoyageError> {
-        let documents = request.documents.as_ref().ok_or_else(|| VoyageError::InvalidRequest("Missing documents".to_string()))?;
+        let documents = request.documents.as_ref().ok_or_else(|| VoyageError::MissingDocuments("Missing documents".to_string()))?;
         
         // Ensure the IDF scores and average document length are calculated
         if self.idf_scores.is_empty() || self.avg_doc_length == 0.0 {
@@ -152,7 +152,7 @@ impl SearchClient {
             .map(|(index, doc)| {
                 let score = self.compute_bm25_score(doc, &query_terms);
                 SearchResult {
-                    document: doc.clone(),
+                    document: doc.to_string(),
                     score: score as i32, // Convert to i32 for consistency
                     index,
                     search_type: SearchType::BM25,

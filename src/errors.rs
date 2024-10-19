@@ -3,6 +3,7 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum VoyageError {
+    MissingDocuments(String),
     #[error("Search builder error: {0}")]
     SearchBuilderError(String),
     #[error("Search index not built")]
