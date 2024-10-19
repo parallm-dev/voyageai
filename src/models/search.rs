@@ -11,8 +11,6 @@ pub enum SearchModel {
     Custom(String),
 }
 
-}
-
 impl SearchModel {
     pub fn as_str(&self) -> &str {
         match self {
