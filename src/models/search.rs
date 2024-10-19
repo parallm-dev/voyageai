@@ -44,7 +44,6 @@ pub struct SearchResponse {
     pub estimated_usage: EstimatedUsage,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SearchResult {
     pub document: String,
@@ -63,4 +62,17 @@ pub struct SearchQuery {
     pub query: String,
     pub model: SearchModel,
     pub max_results: Option<usize>,
+}
+use std::cmp::Ordering;
+
+impl PartialOrd for SearchResult {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for SearchResult {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.score.partial_cmp(&other.score).unwrap()
+    }
 }
