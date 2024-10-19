@@ -15,7 +15,7 @@ async fn test_embeddings_api() -> Result<(), Box<dyn std::error::Error>> {
 
     let _m = server
         .mock("POST", "/v1/embeddings")
-        .match_header("Authorization", mockito::Matcher::Regex("Bearer test_api_key".to_string()))
+        .match_header("Authorization", mockito::Matcher::Exact("Bearer test_api_key".to_string()))
         .match_body(mockito::Matcher::Json(serde_json::json!({
             "input": ["Test input"],
             "model": "voyage-3"
@@ -71,7 +71,7 @@ async fn test_rerank_api() -> Result<(), Box<dyn std::error::Error>> {
 
     let _m = server
         .mock("POST", "/v1/rerank")
-        .match_header("Authorization", mockito::Matcher::Regex("Bearer test_api_key".to_string()))
+        .match_header("Authorization", mockito::Matcher::Exact("Bearer test_api_key".to_string()))
         .match_body(mockito::Matcher::Json(serde_json::json!({
             "query": "What is the capital of France?",
             "documents": ["Paris is the capital of France."],
