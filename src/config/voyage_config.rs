@@ -20,6 +20,7 @@ pub struct VoyageConfig {
     pub api_key: String,
     pub base_url: String,
     pub search_model: SearchModel,
+    pub embedding_model: EmbeddingModel,
 }
 
 impl VoyageConfig {
@@ -28,6 +29,7 @@ impl VoyageConfig {
             api_key,
             base_url: "https://api.voyageai.com/v1".to_string(),
             search_model: SearchModel::default(),
+            embedding_model: EmbeddingModel::default(),
         }
     }
 
@@ -48,6 +50,7 @@ impl Default for VoyageConfig {
             api_key,
             base_url: "https://api.voyageai.com/v1".to_string(),
             search_model: SearchModel::default(),
+            embedding_model: EmbeddingModel::default(),
         }
     }
 }
