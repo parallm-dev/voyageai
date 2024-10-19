@@ -45,6 +45,27 @@ async fn test_rerank() -> Result<(), Box<dyn Error>> {
         Err(e) => panic!("Rerank operation failed: {:?}", e),
     }
 
+    match client.rerank().rerank(&rerank_request).await {
+        Ok(response) => {
+            assert!(!response.data.is_empty(), "Rerank operation returned empty results");
+            assert_eq!(
+                response.data.len(),
+                2,
+                "Expected 2 results due to top_k parameter"
+            );
+            assert!(
+                response.data[0].relevance_score >= response.data[1].relevance_score,
+                "Results should be sorted by relevance score"
+            );
+            assert_eq!(response.data[0].index, 0, "First result should be the most relevant document");
+            assert!(
+                response.usage.total_tokens > 0,
+                "Usage information should be present"
+            );
+        },
+        Err(e) => panic!("Rerank operation failed: {:?}", e),
+    }
+
     Ok(())
 }
 

@@ -121,6 +121,6 @@ mod tests {
 
         // Assert that similarity between similar embeddings is higher than dissimilar ones
         assert!(similarity_1_2 > similarity_1_3);
-        assert!(similarity_1_2 > similarity_2_3);
+        assert!(similarity_1_2 > similarity_2_3)
     }
 }

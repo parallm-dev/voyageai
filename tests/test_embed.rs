@@ -33,7 +33,7 @@ async fn test_embedding() {
         response.data.len(),
         inputs.len(),
         "Number of embeddings should match number of inputs"
-    );
+    )
 
     for (i, embedding) in response.data.iter().enumerate() {
         assert_eq!(

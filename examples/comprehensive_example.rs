@@ -113,5 +113,49 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
+    match client.rerank().rerank(&rerank_request).await {
+        Ok(response) => {
+            println!("Documents reranked. Top results:");
+            for result in response.data.iter().take(2) {
+                println!(
+                    "- {} (score: {})",
+                    documents[result.index], result.relevance_score
+                );
+            }
+            println!("Tokens used: {}", response.usage.total_tokens);
+        }
+        Err(VoyageError::RateLimitExceeded { reset_in }) => {
+            println!(
+                "Rate limit exceeded for reranking. Waiting for {} seconds...",
+                reset_in.as_secs()
+            );
+        }
+        Err(e) => {
+            eprintln!("Error reranking documents: {}", e);
+        }
+    }
+
+    match client.rerank().rerank(&rerank_request).await {
+        Ok(response) => {
+            println!("Documents reranked. Top results:");
+            for result in response.data.iter().take(2) {
+                println!(
+                    "- {} (score: {})",
+                    documents[result.index], result.relevance_score
+                );
+            }
+            println!("Tokens used: {}", response.usage.total_tokens);
+        }
+        Err(VoyageError::RateLimitExceeded { reset_in }) => {
+            println!(
+                "Rate limit exceeded for reranking. Waiting for {} seconds...",
+                reset_in.as_secs()
+            );
+        }
+        Err(e) => {
+            eprintln!("Error reranking documents: {}", e);
+        }
+    }
+
     Ok(())
 }
