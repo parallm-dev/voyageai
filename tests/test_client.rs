@@ -34,7 +34,7 @@ mod tests {
             1,
             "Expected 1 embedding, got {}",
             response.data.len()
-        )
+        );
 
         let embedding = &response.data[0];
         assert!(
