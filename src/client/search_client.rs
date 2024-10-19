@@ -1,5 +1,5 @@
 use std::cmp::Ordering;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use crate::client::{embeddings_client::EmbeddingClient, rerank_client::RerankClient};
 use crate::errors::VoyageError;
@@ -31,16 +31,18 @@ pub struct SearchResult {
 impl PartialOrd for SearchResult {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
+}
 
 
 impl Ord for SearchResult {
     fn cmp(&self, other: &Self) -> Ordering {
         self.score.cmp(&other.score)
+}
 
 /// Client for performing search operations.
 #[derive(Debug, Clone)]
 pub struct SearchClient {
-    #[allow(dead_code)]
+}
     embedding_client: EmbeddingClient,
     #[allow(dead_code)]
     rerank_client: RerankClient,
@@ -100,7 +102,7 @@ impl SearchClient {
         }
 
         Ok(results)
-    }
+}
 
 // Helper function to calculate Euclidean distance
 fn euclidean_distance(a: &[f32], b: &[f32]) -> f32 {
@@ -109,8 +111,8 @@ fn euclidean_distance(a: &[f32], b: &[f32]) -> f32 {
         .map(|(x, y)| (x - y).powi(2))
         .sum::<f32>()
         .sqrt()
-    }
-    }
+}
+}
 
     /// Performs a nearest duplicate search to find similar documents.
     #[allow(dead_code)]

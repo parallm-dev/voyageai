@@ -6,6 +6,7 @@ pub struct Model {
     pub embeddings: EmbeddingsRequestBuilder,
     pub rerank: RerankRequestBuilder,
     pub search: SearchRequestBuilder,
+    search: Option<SearchRequestBuilder>,
 }
 
 impl Model {
@@ -14,6 +15,7 @@ impl Model {
             embeddings: EmbeddingsRequestBuilder::new(),
             rerank: RerankRequestBuilder::new(),
             search: SearchRequestBuilder::new(),
+            search: self.search.unwrap_or_else(SearchRequestBuilder::new),
         }
     }
 
