@@ -3,6 +3,7 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum VoyageError {
+    #[error("Missing documents: {0}")]
     MissingDocuments(String),
     #[error("Search builder error: {0}")]
     SearchBuilderError(String),
@@ -76,6 +77,12 @@ pub enum VoyageError {
 impl From<serde_json::Error> for VoyageError {
     fn from(error: serde_json::Error) -> Self {
         VoyageError::JsonError(error.to_string())
+    }
+}
+
+impl From<reqwest::Error> for VoyageError {
+    fn from(error: reqwest::Error) -> Self {
+        VoyageError::RequestError(error)
     }
 }
 

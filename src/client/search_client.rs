@@ -52,7 +52,7 @@ impl SearchClient {
             .map(|(index, (doc, doc_embedding))| {
                 let distance = Self::euclidean_distance(&query_embedding, &doc_embedding);
                 SearchResult {
-                    document: doc.to_string(),
+                    document: doc.clone(),
                     score: distance as i32, // Convert to i32 for consistency
                     index,
                     search_type: SearchType::NearestNeighbor,
