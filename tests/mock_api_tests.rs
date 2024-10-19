@@ -8,17 +8,24 @@ use voyageai::{
     VoyageAiClient, VoyageConfig,
 };
 
-#[tokio::test]
-async fn test_embeddings_api() {
-    let mut server = mockito::Server::new();
-    test_embeddings_api_inner(&mut server).await;
+#[test]
+fn test_embeddings_api() -> Result<(), Box<dyn std::error::Error>> {
+    let rt = tokio::runtime::Runtime::new()?;
+    rt.block_on(async {
+        let mut server = mockito::Server::new();
+        rt.block_on(async {
+            test_embeddings_api_inner(&mut server).await
+        })
+    })
 }
 
-async fn test_embeddings_api_inner(server: &mut mockito::Server) {
+async fn test_embeddings_api_inner(
+    server: &mut mockito::Server,
+) -> Result<(), Box<dyn std::error::Error>> {
     let mock_url = server.url();
 
     let _m = server
-        .mock("POST", "/embeddings")
+        .mock("POST", "/v1/embeddings")
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body(
@@ -42,7 +49,14 @@ async fn test_embeddings_api_inner(server: &mut mockito::Server) {
         .create();
 
     let config = VoyageConfig::new("test_api_key".to_string()).with_base_url(mock_url);
-    let client = VoyageAiClient::new(config);
+
+    fn setup_test_runtime() -> tokio::runtime::Runtime {
+        tokio::runtime::Runtime::new().expect("Failed to create runtime")
+    }
+
+    let _rt = setup_test_runtime();
+
+    let client = tokio::task::block_in_place(|| VoyageAiClient::new(config));
 
     let request = EmbeddingsRequestBuilder::new()
         .input("Test input")
@@ -50,30 +64,41 @@ async fn test_embeddings_api_inner(server: &mut mockito::Server) {
         .build()
         .unwrap();
 
-    let response = client
-        .embeddings()
-        .create_embedding(&request)
-        .await
-        .unwrap();
+    let response = client.embeddings().create_embedding(&request).await?;
+
+    assert_eq!(response.object, "list");
+    assert_eq!(response.data.len(), 1);
+    assert_eq!(response.data[0].object, "embedding");
+    assert_eq!(response.data[0].embedding, vec![0.1, 0.2, 0.3]);
+    assert_eq!(response.data[0].index, 0);
+    assert_eq!(response.model, "voyage-3");
+    assert_eq!(response.usage.total_tokens, 5);
 
     assert_eq!(response.object, "list");
     assert_eq!(response.data.len(), 1);
     assert_eq!(response.data[0].embedding, vec![0.1, 0.2, 0.3]);
     assert_eq!(response.model, "voyage-3");
     assert_eq!(response.usage.total_tokens, 5);
+
+    Ok(())
 }
 
-#[tokio::test]
-async fn test_rerank_api() {
-    let mut server = mockito::Server::new();
-    test_rerank_api_inner(&mut server).await;
+#[test]
+fn test_rerank_api() -> Result<(), Box<dyn std::error::Error>> {
+    let rt = tokio::runtime::Runtime::new()?;
+    rt.block_on(async {
+        let mut server = mockito::Server::new();
+        rt.block_on(async {
+            test_rerank_api_inner(&mut server).await
+        })
+    })
 }
 
-async fn test_rerank_api_inner(server: &mut mockito::Server) {
+async fn test_rerank_api_inner(server: &mut mockito::Server) -> Result<(), Box<dyn std::error::Error>> {
     let mock_url = server.url();
 
     let _m = server
-        .mock("POST", "/rerank")
+        .mock("POST", "/v1/rerank")
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body(
@@ -104,7 +129,14 @@ async fn test_rerank_api_inner(server: &mut mockito::Server) {
         top_k: None,
     };
 
-    let response = client.rerank().rerank(&request).await.unwrap();
+    let response = client.rerank().rerank(&request).await?;
+
+    assert_eq!(response.data.len(), 1, "Expected exactly one result");
+    assert!(
+        response.data[0].relevance_score > 0.0 && response.data[0].relevance_score <= 1.0,
+        "Relevance score should be between 0 and 1"
+    );
+    assert_eq!(response.data[0].index, 0, "Expected index to be 0");
 
     assert!(!response.data.is_empty(), "Expected at least one result");
     let first_result = &response.data[0];
@@ -112,4 +144,6 @@ async fn test_rerank_api_inner(server: &mut mockito::Server) {
     assert_eq!(first_result.index, 0);
     assert_eq!(response.model, "rerank-2");
     assert_eq!(response.usage.total_tokens, 10);
+
+    Ok(())
 }
