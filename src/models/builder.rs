@@ -1,5 +1,6 @@
 use crate::EmbeddingsRequestBuilder;
 use crate::RerankRequestBuilder;
+use crate::models::search::SearchRequestBuilder; // Add this line
 
 pub struct Model {
     pub embeddings: EmbeddingsRequestBuilder,
@@ -13,7 +14,6 @@ impl Model {
             embeddings: EmbeddingsRequestBuilder::new(),
             rerank: RerankRequestBuilder::new(),
             search: SearchRequestBuilder::new(),
-            search: self.search.unwrap_or_else(SearchRequestBuilder::new),
         }
     }
 

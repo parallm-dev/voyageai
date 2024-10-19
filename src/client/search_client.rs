@@ -12,6 +12,8 @@ pub struct SearchRequest {
     pub top_k: Option<usize>,
     pub search_type: SearchType,
     }
+}
+}
 
 // Define SearchType enum here
 #[derive(Debug, Clone)]
