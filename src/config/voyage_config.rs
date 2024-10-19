@@ -1,4 +1,4 @@
-use crate::models::{EmbeddingModel, RerankModel};
+use crate::models::{EmbeddingModel, RerankModel, search::SearchModel};
 use serde::Deserialize;
 
 #[allow(dead_code)]
@@ -16,8 +16,6 @@ impl Default for Model {
 }
 
 #[derive(Debug, Clone)]
-use crate::models::search::SearchModel;
-
 pub struct VoyageConfig {
     pub api_key: String,
     pub base_url: String,
@@ -29,6 +27,7 @@ impl VoyageConfig {
         Self {
             api_key,
             base_url: "https://api.voyageai.com/v1".to_string(),
+            search_model: SearchModel::default(),
         }
     }
 
@@ -48,6 +47,7 @@ impl Default for VoyageConfig {
         Self {
             api_key,
             base_url: "https://api.voyageai.com/v1".to_string(),
+            search_model: SearchModel::default(),
         }
     }
 }

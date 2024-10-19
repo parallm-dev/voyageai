@@ -38,25 +38,23 @@ impl SearchClient {
         request: &SearchRequest,
     ) -> Result<Vec<SearchResult>, VoyageError> {
         // Obtain embeddings for the query and documents
-        let query_embedding: Vec<f32> = self.embedding_client.embed(&request.query).await?;
-        let document_embeddings: Vec<Vec<f32>> = self
-            .embedding_client
-            .embed_batch(&request.documents)
-            .await?;
+        let query_embedding: Vec<f32> = self.embedding_client.embed(&request.query.query).await?;
+        let document_embeddings: Vec<Vec<f32>> = match &request.documents {
+            Some(docs) => self.embedding_client.embed_batch(docs).await?,
+            None => return Err(VoyageError::MissingDocuments),
+        };
 
         // Calculate distances
-        let mut results = request
-            .documents
+        let mut results = request.documents.as_ref().unwrap()
             .iter()
             .zip(document_embeddings)
             .enumerate()
             .map(|(index, (doc, doc_embedding))| {
                 let distance = Self::euclidean_distance(&query_embedding, &doc_embedding);
                 SearchResult {
-                    document: doc.to_string(),
+                    document: doc.clone(),
                     score: distance as i32, // Convert to i32 for consistency
                     index,
-                    search_type: SearchType::NearestNeighbor,
                     search_type: SearchType::NearestNeighbor,
                 }
             })
@@ -137,17 +135,18 @@ impl SearchClient {
         &mut self,
         request: &SearchRequest,
     ) -> Result<Vec<SearchResult>, VoyageError> {
+        let documents = request.documents.as_ref().ok_or(VoyageError::MissingDocuments)?;
+        
         // Ensure the IDF scores and average document length are calculated
         if self.idf_scores.is_empty() || self.avg_doc_length == 0.0 {
-            self.compute_bm25_parameters(&request.documents);
+            self.compute_bm25_parameters(documents);
         }
 
         // Tokenize the query
-        let query_terms = Self::tokenize(&request.query);
+        let query_terms = Self::tokenize(&request.query.query);
 
         // Calculate BM25 scores
-        let mut results = request
-            .documents
+        let mut results = documents
             .iter()
             .enumerate()
             .map(|(index, doc)| {
@@ -156,6 +155,7 @@ impl SearchClient {
                     document: doc.clone(),
                     score: score as i32, // Convert to i32 for consistency
                     index,
+                    search_type: SearchType::BM25,
                 }
             })
             .collect::<Vec<_>>();
