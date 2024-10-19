@@ -2,44 +2,10 @@ use std::cmp::Ordering;
 use std::collections::{HashMap, HashSet};
 
 use crate::client::{embeddings_client::EmbeddingClient, rerank_client::RerankClient};
+use crate::models::search::{SearchRequest, SearchResult, SearchType};
 use crate::errors::VoyageError;
 
 // Define SearchRequest struct here
-#[derive(Debug, Clone)]
-pub struct SearchRequest {
-    pub query: String,
-    pub documents: Vec<String>,
-    pub top_k: Option<usize>,
-    pub search_type: SearchType,
-}
-
-#[derive(Debug, Clone)]
-pub enum SearchType {
-    Similarity,
-    NearestNeighbor,
-    NearestDuplicate,
-    BM25,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SearchResult {
-    pub document: String,
-    pub score: i32, // Changed from f32 to i32 for Ord implementation
-    pub index: usize,
-}
-
-impl PartialOrd for SearchResult {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    } // Close the partial_cmp method
-} // Add this closing brace to close the impl block
-
-
-impl Ord for SearchResult {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.score.cmp(&other.score)
-    } // Close the Ord implementation
-} // Add this closing brace to close the impl block
 
 /// Client for performing search operations.
 #[derive(Debug, Clone)]
@@ -64,7 +30,7 @@ impl SearchClient {
             idf_scores: HashMap::new(),
             avg_doc_length: 0.0,
         }
-    } // Close the impl block for SearchClient
+    }
 
     // ... (keep existing methods)
     async fn nearest_neighbor_search(
@@ -104,16 +70,15 @@ impl SearchClient {
 
         Ok(results)
     }
-    }
-}
 
-// Helper function to calculate Euclidean distance
-fn euclidean_distance(a: &[f32], b: &[f32]) -> f32 {
-    a.iter()
-        .zip(b)
-        .map(|(x, y)| (x - y).powi(2))
-        .sum::<f32>()
-        .sqrt()
+    // Helper function to calculate Euclidean distance
+    fn euclidean_distance(a: &[f32], b: &[f32]) -> f32 {
+        a.iter()
+            .zip(b)
+            .map(|(x, y)| (x - y).powi(2))
+            .sum::<f32>()
+            .sqrt()
+    }
 }
 }
 
@@ -156,106 +121,107 @@ fn euclidean_distance(a: &[f32], b: &[f32]) -> f32 {
 
         Ok(results)
 
-    // Helper function to calculate cosine similarity
-    fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
-        let dot_product = a.iter().zip(b).map(|(x, y)| x * y).sum::<f32>();
-        let magnitude_a = a.iter().map(|x| x.powi(2)).sum::<f32>().sqrt();
-        let magnitude_b = b.iter().map(|x| x.powi(2)).sum::<f32>().sqrt();
-        dot_product / (magnitude_a * magnitude_b)
-    }
-    }
+}
 
-    /// Performs a BM25 search for improved text relevance.
-    #[allow(dead_code)]
-    async fn bm25_search(
-        &self,
-        _request: &SearchRequest,
-    ) -> Result<Vec<SearchResult>, VoyageError> {
-        // Ensure the IDF scores and average document length are calculated
-        if self.idf_scores.is_empty() || self.avg_doc_length == 0.0 {
-            self.compute_bm25_parameters(&request.documents);
-        }
+// Helper function to calculate cosine similarity
+fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
+    let dot_product = a.iter().zip(b).map(|(x, y)| x * y).sum::<f32>();
+    let magnitude_a = a.iter().map(|x| x.powi(2)).sum::<f32>().sqrt();
+    let magnitude_b = b.iter().map(|x| x.powi(2)).sum::<f32>().sqrt();
+    dot_product / (magnitude_a * magnitude_b)
+}
 
-        // Tokenize the query
-        let query_terms = tokenize(&request.query);
-
-        // Calculate BM25 scores
-        let mut results = request
-            .documents
-            .iter()
-            .enumerate()
-            .map(|(index, doc)| {
-                let score = self.compute_bm25_score(doc, &query_terms);
-                SearchResult {
-                    document: doc.clone(),
-                    score: score as i32, // Convert to i32 for consistency
-                    index,
-                }
-            })
-            .collect::<Vec<_>>();
-
-        // Sort results by score (descending)
-        results.sort_by(|a, b| b.score.cmp(&a.score));
-
-        // Truncate to top_k if specified
-        if let Some(top_k) = request.top_k {
-            results.truncate(top_k);
-        }
-
-        Ok(results)
+/// Performs a BM25 search for improved text relevance.
+#[allow(dead_code)]
+async fn bm25_search(
+    &mut self,
+    request: &SearchRequest,
+) -> Result<Vec<SearchResult>, VoyageError> {
+    // Ensure the IDF scores and average document length are calculated
+    if self.idf_scores.is_empty() || self.avg_doc_length == 0.0 {
+        self.compute_bm25_parameters(&request.documents);
     }
 
-    // Helper methods for BM25
+    // Tokenize the query
+    let query_terms = tokenize(&request.query);
 
-    /// Computes BM25 parameters like IDF scores and average document length.
-    fn compute_bm25_parameters(&mut self, documents: &[String]) {
-        let mut doc_lengths = Vec::new();
-        let mut term_doc_counts = HashMap::new();
-
-        for doc in documents {
-            let terms = tokenize(doc);
-            doc_lengths.push(terms.len());
-
-            let unique_terms: HashSet<&str> = terms.iter().copied().collect();
-            for term in unique_terms {
-                *term_doc_counts.entry(term.to_string()).or_insert(0) += 1;
+    // Calculate BM25 scores
+    let mut results = request
+        .documents
+        .iter()
+        .enumerate()
+        .map(|(index, doc)| {
+            let score = self.compute_bm25_score(doc, &query_terms);
+            SearchResult {
+                document: doc.clone(),
+                score: score as i32, // Convert to i32 for consistency
+                index,
             }
-        }
+        })
+        .collect::<Vec<_>>();
 
-        self.avg_doc_length = doc_lengths.iter().sum::<usize>() as f32 / documents.len() as f32;
+    // Sort results by score (descending)
+    results.sort_by(|a, b| b.score.cmp(&a.score));
 
-        let total_docs = documents.len() as f32;
-        for (term, doc_count) in term_doc_counts {
-            let idf = ((total_docs - doc_count as f32 + 0.5) / (doc_count as f32 + 0.5) + 1.0).ln();
-            self.idf_scores.insert(term, idf);
+    // Truncate to top_k if specified
+    if let Some(top_k) = request.top_k {
+        results.truncate(top_k);
+    }
+
+    Ok(results)
+}
+
+// Helper methods for BM25
+
+/// Computes BM25 parameters like IDF scores and average document length.
+fn compute_bm25_parameters(&mut self, documents: &[String]) {
+    let mut doc_lengths = Vec::new();
+    let mut term_doc_counts = HashMap::new();
+
+    for doc in documents {
+        let terms = tokenize(doc);
+        doc_lengths.push(terms.len());
+
+        let unique_terms: HashSet<&str> = terms.iter().copied().collect();
+        for term in unique_terms {
+            *term_doc_counts.entry(term.to_string()).or_insert(0) += 1;
         }
     }
 
-    /// Computes the BM25 score for a single document and query.
-    fn compute_bm25_score(&self, document: &str, query_terms: &[&str]) -> f32 {
-        const K1: f32 = 1.5;
-        const B: f32 = 0.75;
+    self.avg_doc_length = doc_lengths.iter().sum::<usize>() as f32 / documents.len() as f32;
 
-        let doc_terms = tokenize(document);
-        let doc_length = doc_terms.len() as f32;
-
-        let mut term_frequencies = HashMap::new();
-        for term in doc_terms {
-            *term_frequencies.entry(term).or_insert(0) += 1;
-        }
-
-        let mut score = 0.0;
-        for &term in query_terms {
-            if let Some(&idf) = self.idf_scores.get(term) {
-                let tf = term_frequencies.get(term).copied().unwrap_or(0) as f32;
-                let numerator = tf * (K1 + 1.0);
-                let denominator = tf + K1 * (1.0 - B + B * doc_length / self.avg_doc_length);
-                score += idf * numerator / denominator;
-            }
-        }
-
-        score
+    let total_docs = documents.len() as f32;
+    for (term, doc_count) in term_doc_counts {
+        let idf = ((total_docs - doc_count as f32 + 0.5) / (doc_count as f32 + 0.5) + 1.0).ln();
+        self.idf_scores.insert(term, idf);
     }
+}
+
+/// Computes the BM25 score for a single document and query.
+fn compute_bm25_score(&self, document: &str, query_terms: &[&str]) -> f32 {
+    const K1: f32 = 1.5;
+    const B: f32 = 0.75;
+
+    let doc_terms = tokenize(document);
+    let doc_length = doc_terms.len() as f32;
+
+    let mut term_frequencies = HashMap::new();
+    for term in doc_terms {
+        *term_frequencies.entry(term).or_insert(0) += 1;
+    }
+
+    let mut score = 0.0;
+    for &term in query_terms {
+        if let Some(&idf) = self.idf_scores.get(term) {
+            let tf = term_frequencies.get(term).copied().unwrap_or(0) as f32;
+            let numerator = tf * (K1 + 1.0);
+            let denominator = tf + K1 * (1.0 - B + B * doc_length / self.avg_doc_length);
+            score += idf * numerator / denominator;
+        }
+    }
+
+    score
+}
 
 // Tokenization helper function
 fn tokenize(text: &str) -> Vec<&str> {

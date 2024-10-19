@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[derive(Default)]
 pub enum SearchModel {
     #[default]
@@ -47,7 +47,7 @@ pub struct SearchResponse {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SearchResult {
     pub document: String,
-    pub score: f32,
+    pub score: i32, // Changed to i32 for consistency
     pub index: usize,
     pub search_type: SearchType,
 }
@@ -67,12 +67,12 @@ use std::cmp::Ordering;
 
 impl PartialOrd for SearchResult {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
+        self.score.partial_cmp(&other.score)
     }
 }
 
 impl Ord for SearchResult {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.score.partial_cmp(&other.score).unwrap()
+        self.partial_cmp(other).unwrap_or(Ordering::Equal)
     }
 }
