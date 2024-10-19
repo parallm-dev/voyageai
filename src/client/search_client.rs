@@ -33,6 +33,7 @@ impl SearchClient {
     }
 
     // ... (keep existing methods)
+    #[allow(dead_code)]
     async fn nearest_neighbor_search(
         &self,
         request: &SearchRequest,
@@ -72,6 +73,7 @@ impl SearchClient {
     }
 
     // Helper function to calculate Euclidean distance
+    #[allow(dead_code)]
     fn euclidean_distance(a: &[f32], b: &[f32]) -> f32 {
         a.iter()
             .zip(b)

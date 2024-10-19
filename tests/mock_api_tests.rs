@@ -10,7 +10,7 @@ use voyageai::{
 
 #[tokio::test]
 async fn test_embeddings_api() -> Result<(), Box<dyn std::error::Error>> {
-    let server = mockito::Server::new_async().await;
+    let mut server = mockito::Server::new_async().await;
     let mock_url = server.url();
 
     let _m = server
@@ -61,7 +61,7 @@ async fn test_embeddings_api() -> Result<(), Box<dyn std::error::Error>> {
 
 #[tokio::test]
 async fn test_rerank_api() -> Result<(), Box<dyn std::error::Error>> {
-    let server = mockito::Server::new_async().await;
+    let mut server = mockito::Server::new_async().await;
     let mock_url = server.url();
 
     let _m = server
