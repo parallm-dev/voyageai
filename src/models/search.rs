@@ -25,6 +25,7 @@ impl SearchModel {
 
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum SearchType {
     #[serde(rename = "similarity")]
     Similarity,
@@ -58,6 +59,7 @@ pub struct EstimatedUsage {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SearchQuery {
     pub query: String,
     pub model: SearchModel,

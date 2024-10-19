@@ -38,8 +38,8 @@ impl SearchClient {
         request: &SearchRequest,
     ) -> Result<Vec<SearchResult>, VoyageError> {
         // Obtain embeddings for the query and documents
-        let query_embedding = self.embedding_client.embed(&request.query).await?;
-        let document_embeddings = self
+        let query_embedding: Vec<f32> = self.embedding_client.embed(&request.query).await?;
+        let document_embeddings: Vec<Vec<f32>> = self
             .embedding_client
             .embed_batch(&request.documents)
             .await?;
@@ -53,9 +53,10 @@ impl SearchClient {
             .map(|(index, (doc, doc_embedding))| {
                 let distance = Self::euclidean_distance(&query_embedding, &doc_embedding);
                 SearchResult {
-                    document: doc.clone(),
+                    document: doc.to_string(),
                     score: distance as i32, // Convert to i32 for consistency
                     index,
+                    search_type: SearchType::NearestNeighbor,
                 }
             })
             .collect::<Vec<_>>();
