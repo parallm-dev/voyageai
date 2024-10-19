@@ -15,7 +15,7 @@ async fn test_embeddings_api() -> Result<(), Box<dyn std::error::Error>> {
 
     let _m = server
         .mock("POST", "/v1/embeddings")
-        .match_header("Authorization", mockito::Matcher::Any)
+        .match_header("Authorization", mockito::Matcher::Regex("Bearer .+".to_string()))
         .expect(1)
         .with_status(200)
         .with_header("content-type", "application/json")
@@ -41,7 +41,7 @@ async fn test_embeddings_api() -> Result<(), Box<dyn std::error::Error>> {
         .create_async()
         .await;
 
-    let config = VoyageConfig::new("test_api_key".to_string()).with_base_url(mock_url);
+    let config = VoyageConfig::new("test_api_key".to_string()).with_base_url(mock_url.clone());
     let client = VoyageAiClient::new(config);
 
     let request = EmbeddingsRequestBuilder::new()
@@ -49,7 +49,10 @@ async fn test_embeddings_api() -> Result<(), Box<dyn std::error::Error>> {
         .model(EmbeddingModel::Voyage3)
         .build()?;
 
-    let response = client.embeddings().create_embedding(&request).await?;
+    let response = client.embeddings().create_embedding(&request).await.map_err(|e| {
+        eprintln!("Error creating embedding: {:?}", e);
+        e
+    })?;
 
     assert_eq!(response.object, "list");
     assert_eq!(response.data.len(), 1);
@@ -104,7 +107,10 @@ async fn test_rerank_api() -> Result<(), Box<dyn std::error::Error>> {
         top_k: None,
     };
 
-    let response = client.rerank().rerank(&request).await?;
+    let response = client.rerank().rerank(&request).await.map_err(|e| {
+        eprintln!("Error reranking: {:?}", e);
+        e
+    })?;
 
     assert_eq!(response.data.len(), 1, "Expected exactly one result");
     assert!(
