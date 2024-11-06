@@ -25,7 +25,7 @@ pub trait Reranker: Send + Sync {
 
 impl VoyageAiClient {
     pub async fn embeddings(&self, request: EmbeddingsRequest) -> Result<EmbeddingsResponse, VoyageError> {
-        self.create_embeddings(request.input).await
+        self.embeddings(request).await
     }
 }
 
