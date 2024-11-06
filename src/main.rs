@@ -71,7 +71,7 @@ async fn handle_command(cli: &Cli, client: &VoyageAiClient) -> Result<(), Box<dy
                 .input_type(InputType::Document)
                 .build()
                 .expect("Failed to build embeddings request");
-            let response = client.create_embeddings(request.input).await?;
+            let response = client.embeddings(request.input).await?;
 
             println!("Generated {} embeddings", response.data.len());
             for (i, embedding) in response.data.iter().enumerate() {
