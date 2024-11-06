@@ -167,3 +167,9 @@ impl VoyageBuilder {
         Ok(response.data.into_iter().map(|d| d.embedding).collect())
     }
 }
+
+impl Default for VoyageBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
