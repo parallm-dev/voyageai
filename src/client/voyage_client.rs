@@ -71,6 +71,10 @@ impl Default for VoyageAiClient {
 }
 
 impl VoyageAiClient {
+    pub fn embeddings_client(&self) -> &Arc<EmbeddingClient> {
+        &self.config.embeddings_client
+    }
+
     pub fn new_with_config(config: VoyageConfig) -> Self {
         info!("Creating new VoyageAiClient");
         let rate_limiter = Arc::new(RateLimiter::new());
