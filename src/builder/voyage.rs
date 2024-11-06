@@ -37,10 +37,21 @@ impl VoyageBuilder {
         self
     }
 
-    pub fn build(&self) -> Result<VoyageAiClient, VoyageError> {
-        let config = self.config.as_ref()
+    pub fn build(self) -> Result<VoyageAiClient, VoyageError> {
+        let config = self.config
             .ok_or_else(|| VoyageError::BuilderError("API key is required".to_string()))?;
-        Ok(VoyageAiClient::with_key(config.api_key()))
+        
+        Ok(VoyageAiClient {
+            config: VoyageAiClientConfig {
+                config,
+                embeddings_client: Arc::new(EmbeddingClient::new(config.clone(), Arc::new(RateLimiter::new()))),
+                rerank_client: Arc::new(DefaultRerankClient::new(config.clone(), Arc::new(RateLimiter::new()))),
+                search_client: Arc::new(SearchClient::new(
+                    EmbeddingClient::new(config.clone(), Arc::new(RateLimiter::new())),
+                    DefaultRerankClient::new(config.clone(), Arc::new(RateLimiter::new()))
+                )),
+            }
+        })
     }
 }
 
