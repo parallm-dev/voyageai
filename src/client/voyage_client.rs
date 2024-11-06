@@ -29,14 +29,22 @@ pub struct VoyageAiClientConfig {
 }
 
 use crate::traits::voyage::VoyageAiClientExt;
+use crate::models::embeddings::EmbeddingsRequest;
 
 #[async_trait]
 impl VoyageAiClientExt for Arc<RwLock<VoyageAiClient>> {
-    async fn create_embeddings(
-        &self,
-        input: impl Into<EmbeddingsInput> + Send,
-    ) -> Result<EmbeddingsResponse, Box<dyn std::error::Error>> {
-        self.read().await.create_embeddings(input).await
+    pub async fn create_embeddings(&self, request: EmbeddingsRequest) -> Result<EmbeddingsResponse, VoyageError> {
+        let response = self.client
+            .post(&self.config.embeddings_url())
+            .json(&request)
+            .send()
+            .await?;
+
+        if response.status().is_success() {
+            Ok(response.json().await?)
+        } else {
+            Err(VoyageError::from_response(response).await)
+        }
     }
 
     async fn rerank(

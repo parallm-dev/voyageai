@@ -14,6 +14,9 @@ use tokio::sync::RwLock;
 #[derive(Clone)]
 pub struct VoyageBuilder {
     config: Option<VoyageConfig>,
+    embeddings: Option<EmbeddingsRequestBuilder>,
+    rerank: Option<RerankRequestBuilder>,
+    search: Option<SearchRequestBuilder>,
 }
 
 impl Default for VoyageBuilder {
@@ -29,7 +32,9 @@ impl Default for VoyageBuilder {
 
 impl VoyageBuilder {
     pub fn new() -> VoyageBuilder {
-        VoyageBuilder { config: None }
+        VoyageBuilder {
+            config: None
+        }
     }
 
     pub fn with_api_key(mut self, api_key: impl Into<String>) -> VoyageBuilder {
@@ -101,6 +106,28 @@ impl VoyageBuilder {
                     .map(|r| r.relevance_score as f32)
                     .collect::<Vec<f32>>()
             })
+    }
+
+    pub async fn rerank(&self, query: impl Into<String>, documents: Vec<String>) -> Result<Vec<f32>, VoyageError>  {
+        let client = self
+            .build()
+            .map_err(|e| VoyageError::BuilderError(e.to_string()))?;
+        let client = client.write().await;
+
+        let rerank_request = RerankRequest::new(query.into(), documents, Default::default(), None)
+            .map_err(VoyageError::from)?;
+
+        client
+            .rerank(rerank_request)
+            .await
+            .map_err(|e| VoyageError::BuilderError(e.to_string()))
+            .map(|response| {
+                response
+                    .data
+                    .into_iter()
+                    .filter_map(|r| r.fv                 document)
+                    .collect()
+            })s
     }
 
     pub async fn embed(&self, text: impl Into<String>) -> Result<Vec<f32>, VoyageError> {
