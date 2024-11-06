@@ -61,7 +61,7 @@ impl VoyageAiClientExt for Arc<RwLock<VoyageAiClient>> {
 
 #[derive(Clone)]
 pub struct VoyageAiClient {
-    config: VoyageAiClientConfig,
+    pub config: VoyageAiClientConfig,
 }
 
 impl Default for VoyageAiClient {
