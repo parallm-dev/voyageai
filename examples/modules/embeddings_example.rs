@@ -20,7 +20,7 @@ pub async fn run_example() -> Result<(), Box<dyn std::error::Error>> {
         .build()
         .expect("Failed to build embeddings request");
 
-    let response = embeddings_request.send(&mut client).await?;
+    let response = embeddings_request.send().await?;
     for (i, embedding) in response.data.iter().enumerate() {
         println!("Embedding for '{}': {:?}", inputs[i], embedding.embedding);
     }
