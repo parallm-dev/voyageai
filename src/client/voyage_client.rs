@@ -29,7 +29,6 @@ pub struct VoyageAiClientConfig {
 }
 
 use crate::traits::voyage::VoyageAiClientExt;
-use crate::models::embeddings::EmbeddingsRequest;
 
 #[async_trait]
 impl VoyageAiClientExt for Arc<RwLock<VoyageAiClient>> {

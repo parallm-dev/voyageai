@@ -1,4 +1,3 @@
-use crate::client::VoyageAiClient;
 use crate::VoyageError;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;

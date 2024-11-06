@@ -3,7 +3,6 @@ use crate::{
     client::{SearchRequest, VoyageAiClient},
     RerankRequestBuilder,
     SearchRequestBuilder,
-    VoyageError,
     config::VoyageConfig,
     errors::VoyageError,
     models::{
@@ -26,7 +25,10 @@ pub struct VoyageBuilder {
 impl VoyageBuilder {
     pub fn new() -> VoyageBuilder {
         VoyageBuilder {
-            config: None
+            config: None,
+            embeddings: None,
+            rerank: None,
+            search: None
         }
     }
 

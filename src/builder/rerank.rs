@@ -1,5 +1,6 @@
 use crate::models::rerank::{RerankModel, RerankRequest};
 
+#[derive(Clone)]
 pub struct RerankRequestBuilder {
     query: Option<String>,
     documents: Option<Vec<String>>,

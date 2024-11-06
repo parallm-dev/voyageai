@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 
 /// Builder for creating a search request.
 #[derive(Debug, Default)]
+#[derive(Clone)]
 pub struct SearchRequestBuilder {
     query: Option<String>,
     documents: Option<Vec<String>>,
