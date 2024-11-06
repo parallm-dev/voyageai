@@ -25,7 +25,7 @@ pub trait Reranker: Send + Sync {
 
 impl VoyageAiClient {
     pub async fn embeddings(&self, request: EmbeddingsRequest) -> Result<EmbeddingsResponse, VoyageError> {
-        self.config.embeddings_client.create_embedding(&request).await
+        self.embeddings(request).await
     }
 }
 
@@ -41,7 +41,7 @@ impl Embedder for VoyageAiClient {
         };
 
         let embeddings = self.embeddings(request).await?;
-        Ok(embeddings[0].clone())
+        Ok(embeddings.data[0].embedding.clone())
     }
 
     async fn embed_batch(&self, texts: &[String]) -> Result<Vec<Vec<f32>>, VoyageError> {
@@ -54,7 +54,7 @@ impl Embedder for VoyageAiClient {
         };
 
         let embeddings = self.embeddings(request).await?;
-        Ok(embeddings)
+        Ok(embeddings.data.into_iter().map(|d| d.embedding).collect())
     }
 }
 #[async_trait]
