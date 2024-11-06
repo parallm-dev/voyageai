@@ -133,9 +133,9 @@ impl VoyageBuilder {
                 response
                     .data
                     .into_iter()
-                    .filter_map(|r| r.fv                 document)
+                    .filter_map(|r| r.document)
                     .collect()
-            })s
+            })
     }
 
     pub async fn embed(&self, text: impl Into<String>) -> Result<Vec<f32>, VoyageError> {
