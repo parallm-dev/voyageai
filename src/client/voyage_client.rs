@@ -48,14 +48,14 @@ impl VoyageAiClientExt for Arc<RwLock<VoyageAiClient>> {
         &self,
         request: RerankRequest,
     ) -> Result<RerankResponse, Box<dyn std::error::Error>> {
-        self.read().await.rerank(request).await
+        self.read().await.rerank(request).await.map_err(|e| Box::new(e) as Box<dyn std::error::Error>)
     }
 
     async fn search(
         &self,
         request: SearchRequest,
     ) -> Result<Vec<SearchResult>, Box<dyn std::error::Error>> {
-        self.read().await.search(request).await
+        self.read().await.search(request).await.map_err(|e| Box::new(e) as Box<dyn std::error::Error>)
     }
 }
 
@@ -137,7 +137,7 @@ impl VoyageAiClient {
             .model(self.config.config.embedding_model)
             .build()?;
 
-        let response = self.create_embeddings(request.input).await?;
+        let response = self.embeddings(request.input).await?;
         Ok(response.data.into_iter().next()
             .map(|d| d.embedding)
             .unwrap_or_default())
@@ -149,7 +149,7 @@ impl VoyageAiClient {
             .model(self.config.config.embedding_model)
             .build()?;
 
-        let response = self.create_embeddings(request.input).await?;
+        let response = self.embeddings(request.input).await?;
         Ok(response.data.into_iter().map(|d| d.embedding).collect())
     }
 
@@ -191,7 +191,7 @@ impl<'a> ChainedOperationBuilder<'a> {
     }
 
     pub async fn embed_documents(mut self, input: impl Into<EmbeddingsInput>) -> Self {
-        if let Ok(response) = self.client.create_embeddings(input).await {
+        if let Ok(response) = self.client.embeddings(input).await {
             self.embedded_docs = Some(response.data.into_iter().map(|e| e.embedding).collect());
         }
         self
