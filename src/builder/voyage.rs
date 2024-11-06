@@ -1,9 +1,4 @@
 use crate::{
-    builder::{
-        embeddings::EmbeddingsRequestBuilder,
-        rerank::RerankRequestBuilder,
-        search::SearchRequestBuilder,
-    },
     client::{
         embeddings_client::EmbeddingClient,
         rerank_client::DefaultRerankClient,
@@ -21,14 +16,10 @@ pub struct VoyageBuilder {
     config: Option<VoyageConfig>,
 }
 
-
 impl VoyageBuilder {
     pub fn new() -> VoyageBuilder {
         VoyageBuilder {
             config: None,
-            embeddings: None,
-            rerank: None,
-            search: None
         }
     }
 
