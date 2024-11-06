@@ -18,7 +18,6 @@ pub enum EmbeddingsInput {
     Multiple(Vec<String>),
 }
 
-
 impl TryFrom<&[String]> for EmbeddingsInput {
     type Error = VoyageError;
     fn try_from(v: &[String]) -> Result<Self, Self::Error> {
@@ -45,6 +44,18 @@ impl From<Vec<String>> for EmbeddingsInput {
     fn from(v: Vec<String>) -> Self {
         EmbeddingsInput::Multiple(v)
     }
+}
+
+#[derive(Debug, Serialize)]
+pub struct EmbeddingsRequest {
+    pub input: EmbeddingsInput,
+    pub model: EmbeddingModel,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub input_type: Option<InputType>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub truncation: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub encoding_format: Option<EncodingFormat>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -124,28 +135,5 @@ impl EmbeddingModel {
             Self::Voyage3Lite => 256,
             Self::VoyageFinance2 | Self::VoyageMultilingual2 | Self::VoyageLaw2 => 1024,
         }
-    }
-}
-
-#[derive(Debug, Serialize)]
-pub struct EmbeddingsRequest {
-    pub input: EmbeddingsInput,
-    pub model: EmbeddingModel,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub input_type: Option<InputType>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub truncation: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub encoding_format: Option<EncodingFormat>,
-}
-
-impl EmbeddingsRequest {
-    pub async fn send(
-        self,
-        client: &mut VoyageAiClient,
-    ) -> Result<EmbeddingsResponse, VoyageError> {
-        client.create_embeddings(self.input).await.map_err(|e| {
-            VoyageError::ApiError(reqwest::StatusCode::INTERNAL_SERVER_ERROR, e.to_string())
-        })
     }
 }
