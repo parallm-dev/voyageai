@@ -137,7 +137,7 @@ impl VoyageAiClient {
             .model(self.config.config.embedding_model)
             .build()?;
 
-        let response = self.embeddings(request.input).await?;
+        let response = self.embeddings(request).await?;
         Ok(response.data.into_iter().next()
             .map(|d| d.embedding)
             .unwrap_or_default())
