@@ -149,7 +149,7 @@ impl VoyageAiClient {
             .model(self.config.config.embedding_model)
             .build()?;
 
-        let response = self.embeddings(request.input).await?;
+        let response = self.embeddings(request).await?;
         Ok(response.data.into_iter().map(|d| d.embedding).collect())
     }
 
@@ -191,7 +191,14 @@ impl<'a> ChainedOperationBuilder<'a> {
     }
 
     pub async fn embed_documents(mut self, input: impl Into<EmbeddingsInput>) -> Self {
-        if let Ok(response) = self.client.embeddings(input).await {
+        let request = EmbeddingsRequest {
+            input: input.into(),
+            model: self.client.config.config.embedding_model,
+            input_type: None,
+            truncation: None,
+            encoding_format: None,
+        };
+        if let Ok(response) = self.client.embeddings(request).await {
             self.embedded_docs = Some(response.data.into_iter().map(|e| e.embedding).collect());
         }
         self

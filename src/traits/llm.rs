@@ -1,6 +1,6 @@
 use crate::errors::VoyageError;
 use crate::models::{
-    embeddings::{EmbeddingModel, EmbeddingsInput, EmbeddingsRequest},
+    embeddings::{EmbeddingModel, EmbeddingsInput, EmbeddingsRequest, EmbeddingsResponse},
     rerank::{RerankModel, RerankRequest},
 };
 use crate::VoyageAiClient;
@@ -25,7 +25,7 @@ pub trait Reranker: Send + Sync {
 
 impl VoyageAiClient {
     pub async fn embeddings(&self, request: EmbeddingsRequest) -> Result<EmbeddingsResponse, VoyageError> {
-        self.embeddings_client.create_embedding(&request).await
+        self.config.embeddings_client.create_embedding(&request).await
     }
 }
 
