@@ -2,21 +2,16 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use async_trait::async_trait;
 use crate::{
-    builder::embeddings::EmbeddingsRequestBuilder,
-    errors::VoyageError,
-    models::embeddings::{EmbeddingsInput, EmbeddingsRequest, EmbeddingsResponse},
-};
-
-use crate::{
     builder::search::SearchRequest,
-    models::model_type::ModelType,
     client::{
-        embeddings_client::EmbeddingClient, rerank_client::DefaultRerankClient,
-        search_client::SearchClient, RateLimiter, RerankClient,
+        embeddings_client::EmbeddingClient, 
+        rerank_client::DefaultRerankClient,
+        search_client::SearchClient, 
+        RateLimiter, 
+        RerankClient,
     },
     config::VoyageConfig,
     models::{
-        embeddings::{EmbeddingsInput, EmbeddingsRequest, EmbeddingsResponse},
         rerank::{RerankModel, RerankRequest, RerankResponse},
         search::{SearchModel, SearchQuery, SearchType},
     },
@@ -126,7 +121,7 @@ impl VoyageAiClient {
 
         self.config
             .embeddings_client
-            .embed(&request)
+            .create_embedding(&request)
             .await
             .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)
     }

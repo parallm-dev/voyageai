@@ -1,5 +1,9 @@
 use crate::{
-    builder::embeddings::EmbeddingsRequestBuilder,
+    builder::{
+        embeddings::EmbeddingsRequestBuilder,
+        rerank::RerankRequestBuilder,
+        search::SearchRequestBuilder,
+    },
     client::{
         embeddings_client::EmbeddingClient,
         rerank_client::DefaultRerankClient,
