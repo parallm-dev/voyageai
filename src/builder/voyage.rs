@@ -1,17 +1,16 @@
 use crate::{
     builder::embeddings::EmbeddingsRequestBuilder,
-    client::{SearchRequest, VoyageAiClient},
-    RerankRequestBuilder,
-    SearchRequestBuilder,
+    client::{
+        embeddings_client::EmbeddingClient,
+        rerank_client::DefaultRerankClient,
+        search_client::SearchClient,
+        RateLimiter,
+        voyage_client::{VoyageAiClient, VoyageAiClientConfig},
+    },
     config::VoyageConfig,
     errors::VoyageError,
-    models::{
-        rerank::RerankRequest,
-        search::{SearchQuery, SearchType},
-    },
 };
 use std::sync::Arc;
-use tokio::sync::RwLock;
 
 #[derive(Clone)]
 pub struct VoyageBuilder {

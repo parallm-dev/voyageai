@@ -1,6 +1,11 @@
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use async_trait::async_trait;
+use crate::{
+    builder::embeddings::EmbeddingsRequestBuilder,
+    errors::VoyageError,
+    models::embeddings::{EmbeddingsInput, EmbeddingsRequest, EmbeddingsResponse},
+};
 
 use crate::{
     builder::search::SearchRequest,
@@ -109,7 +114,7 @@ impl VoyageAiClient {
         &self,
         input: impl Into<EmbeddingsInput>,
     ) -> Result<EmbeddingsResponse, Box<dyn std::error::Error>> {
-        debug!("Accessing EmbeddingClient for {} model", ModelType::Embedding(self.config.config.embedding_model).as_str());
+        debug!("Accessing EmbeddingClient for embeddings request");
 
         let request = EmbeddingsRequest {
             input: input.into(),
@@ -121,7 +126,7 @@ impl VoyageAiClient {
 
         self.config
             .embeddings_client
-            .create_embedding(&request)
+            .embed(&request)
             .await
             .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)
     }
