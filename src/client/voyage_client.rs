@@ -126,43 +126,37 @@ impl VoyageAiClient {
             .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)
     }
 
-    pub async fn embed_text(
-        &self,
-        text: impl Into<String>,
-    ) -> Result<Vec<Vec<f32>>, Box<dyn std::error::Error>> {
-        let text = text.into();
-        let input = EmbeddingsInput::from(vec![text]);
-        let response = self.create_embeddings(input).await?;
-        Ok(response.data.into_iter().map(|e| e.embedding).collect())
+    pub async fn embed_text(&self, text: impl Into<String>) -> Result<Vec<f32>, VoyageError> {
+        let request = EmbeddingsRequestBuilder::new()
+            .document(text)
+            .model(self.config.config.embedding_model)
+            .build()?;
+
+        let response = self.create_embeddings(request.input).await?;
+        Ok(response.data.into_iter().next()
+            .map(|d| d.embedding)
+            .unwrap_or_default())
     }
 
-    pub async fn embed_documents(
-        &self,
-        documents: Vec<impl Into<String>>,
-    ) -> Result<Vec<Vec<f32>>, Box<dyn std::error::Error>> {
-        let docs: Vec<String> = documents.into_iter().map(|d| d.into()).collect();
-        let input = EmbeddingsInput::from(docs);
-        let response = self.create_embeddings(input).await?;
-        Ok(response.data.into_iter().map(|e| e.embedding).collect())
+    pub async fn embed_batch(&self, texts: Vec<String>) -> Result<Vec<Vec<f32>>, VoyageError> {
+        let request = EmbeddingsRequestBuilder::new()
+            .documents(texts)
+            .model(self.config.config.embedding_model)
+            .build()?;
+
+        let response = self.create_embeddings(request.input).await?;
+        Ok(response.data.into_iter().map(|d| d.embedding).collect())
     }
 
-    pub async fn rerank(
-        &self,
-        request: RerankRequest,
-    ) -> Result<RerankResponse, Box<dyn std::error::Error>> {
+    pub async fn rerank(&self, request: RerankRequest) -> Result<RerankResponse, VoyageError> {
         debug!("Accessing RerankClient");
-        let response = self.config.rerank_client.rerank(&request).await?;
-        Ok(response)
+        self.config.rerank_client.rerank(&request).await
     }
 
-    pub async fn search(
-        &self,
-        request: SearchRequest,
-    ) -> Result<Vec<SearchResult>, Box<dyn std::error::Error>> {
+    pub async fn search(&self, request: SearchRequest) -> Result<Vec<SearchResult>, VoyageError> {
         debug!("Accessing SearchClient");
-        let search_client = &self.config.search_client;
-        let search_results = search_client.clone().search(&request).await?;
-        Ok(search_results)
+        self.config.search_client.search(&request).await
+            .map_err(VoyageError::from)
     }
 
     pub fn chain(&self) -> ChainedOperationBuilder {
