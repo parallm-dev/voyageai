@@ -22,21 +22,6 @@ pub struct VoyageBuilder {
     search: Option<SearchRequestBuilder>,
 }
 
-impl Default for VoyageBuilder {
-    fn default() -> Self {
-        let api_key = std::env::var("VOYAGE_API_KEY")
-            .or_else(|_| std::env::var("VOYAGEAI_API_KEY"))
-            .ok()
-            .map(VoyageConfig::new);
-
-        VoyageBuilder { 
-            config: api_key,
-            embeddings: None,
-            rerank: None,
-            search: None
-        }
-    }
-}
 
 impl VoyageBuilder {
     pub fn new() -> VoyageBuilder {
@@ -116,8 +101,6 @@ impl VoyageBuilder {
             })
     }
 
-    }
-
     pub async fn embed(&self, text: impl Into<String>) -> Result<Vec<f32>, VoyageError> {
         let client = self
             .build()
@@ -168,8 +151,3 @@ impl VoyageBuilder {
     }
 }
 
-impl Default for VoyageBuilder {
-    fn default() -> Self {
-        Self::new()
-    }
-}
