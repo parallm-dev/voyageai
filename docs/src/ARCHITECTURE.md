@@ -111,3 +111,68 @@ To further improve the library's consistency with the VoyageAI API and enhance i
 6. Explore possibilities for performance optimizations, especially for handling large volumes of requests.
 
 By continuing to refine and improve the `voyageai` library, we aim to provide a robust, efficient, and user-friendly interface for interacting with the VoyageAI API.
+# Architecture
+
+The VoyageAI SDK is structured around several key components that work together to provide embeddings, reranking, and search functionality.
+
+## Core Components
+
+### Client Layer
+- `VoyageAiClient`: The main entry point for interacting with the API
+- `EmbeddingClient`: Handles embedding generation requests
+- `RerankClient`: Manages document reranking operations
+- `SearchClient`: Provides vector similarity search capabilities
+
+### Builder Pattern
+The SDK uses the Builder pattern extensively:
+- `VoyageBuilder`: Constructs the main client
+- `EmbeddingsRequestBuilder`: Creates embedding requests
+- `RerankRequestBuilder`: Builds reranking requests
+- `SearchRequestBuilder`: Constructs search queries
+
+### Rate Limiting
+- Built-in rate limiting with `RateLimiter`
+- Handles both requests per minute (RPM) and tokens per minute (TPM)
+- Automatic backoff and retry mechanisms
+
+### Error Handling
+- Custom error types with `VoyageError`
+- Comprehensive error categorization
+- Proper error propagation
+
+## Data Flow
+
+1. Client Initialization
+   ```rust
+   let client = VoyageBuilder::new()
+       .with_api_key(api_key)
+       .build()?;
+   ```
+
+2. Request Building
+   ```rust
+   let request = EmbeddingsRequestBuilder::new()
+       .input(text)
+       .model(EmbeddingModel::Voyage3)
+       .build()?;
+   ```
+
+3. API Interaction
+   ```rust
+   let response = client.embed(request).await?;
+   ```
+
+## Design Principles
+
+1. **Type Safety**: Extensive use of Rust's type system
+2. **Ergonomic API**: Builder pattern for request construction
+3. **Resource Management**: Automatic rate limiting
+4. **Error Handling**: Rich error types and proper propagation
+5. **Async First**: Built on Tokio for async/await support
+
+## Testing Strategy
+
+- Unit tests for individual components
+- Integration tests for API interactions
+- Property-based testing for complex operations
+- Mocking for API responses
