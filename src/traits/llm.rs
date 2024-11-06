@@ -25,7 +25,7 @@ pub trait Reranker: Send + Sync {
 
 impl VoyageAiClient {
     async fn embeddings(&self, request: EmbeddingsRequest) -> Result<Vec<Vec<f32>>, VoyageError> {
-        let response = self.create_embeddings(request.input).await.map_err(|e| {
+        let response = self.embeddings(request.input).await.map_err(|e| {
             VoyageError::ApiError(reqwest::StatusCode::INTERNAL_SERVER_ERROR, e.to_string())
         })?;
         Ok(response.data.into_iter().map(|e| e.embedding).collect())
