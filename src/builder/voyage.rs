@@ -116,26 +116,6 @@ impl VoyageBuilder {
             })
     }
 
-    pub async fn rerank(&self, query: impl Into<String>, documents: Vec<String>) -> Result<Vec<f32>, VoyageError>  {
-        let client = self
-            .build()
-            .map_err(|e| VoyageError::BuilderError(e.to_string()))?;
-        let client = client.write().await;
-
-        let rerank_request = RerankRequest::new(query.into(), documents, Default::default(), None)
-            .map_err(VoyageError::from)?;
-
-        client
-            .rerank(rerank_request)
-            .await
-            .map_err(|e| VoyageError::BuilderError(e.to_string()))
-            .map(|response| {
-                response
-                    .data
-                    .into_iter()
-                    .filter_map(|r| r.document)
-                    .collect()
-            })
     }
 
     pub async fn embed(&self, text: impl Into<String>) -> Result<Vec<f32>, VoyageError> {
