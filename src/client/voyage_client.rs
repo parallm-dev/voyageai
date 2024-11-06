@@ -32,11 +32,11 @@ use crate::traits::voyage::VoyageAiClientExt;
 
 #[async_trait]
 impl VoyageAiClientExt for Arc<RwLock<VoyageAiClient>> {
-    async fn create_embeddings(
+    async fn embed(
         &self,
         input: impl Into<EmbeddingsInput> + Send,
     ) -> Result<EmbeddingsResponse, Box<dyn std::error::Error>> {
-        self.read().await.create_embeddings(input).await
+        self.read().await.embed(input).await
     }
 
     async fn rerank(
@@ -105,7 +105,7 @@ impl VoyageAiClient {
         Self::new_with_config(VoyageConfig::new(api_key.into()))
     }
 
-    pub async fn create_embeddings(
+    pub async fn embed(
         &self,
         input: impl Into<EmbeddingsInput>,
     ) -> Result<EmbeddingsResponse, Box<dyn std::error::Error>> {

@@ -6,7 +6,7 @@ use async_trait::async_trait;
 
 #[async_trait]
 pub trait VoyageAiClientExt {
-    async fn create_embeddings(
+    async fn embed(
         &self,
         input: impl Into<EmbeddingsInput> + Send,
     ) -> Result<EmbeddingsResponse, Box<dyn std::error::Error>>;
