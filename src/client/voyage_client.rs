@@ -2,7 +2,10 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use async_trait::async_trait;
 use crate::{
-    builder::search::SearchRequest,
+    builder::{
+        search::SearchRequest,
+        embeddings::EmbeddingsRequestBuilder,
+    },
     client::{
         embeddings_client::EmbeddingClient, 
         rerank_client::DefaultRerankClient,
@@ -11,7 +14,9 @@ use crate::{
         RerankClient,
     },
     config::VoyageConfig,
+    errors::VoyageError,
     models::{
+        embeddings::{EmbeddingsInput, EmbeddingsRequest, EmbeddingsResponse},
         rerank::{RerankModel, RerankRequest, RerankResponse},
         search::{SearchModel, SearchQuery, SearchType},
     },

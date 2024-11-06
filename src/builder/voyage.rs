@@ -44,14 +44,15 @@ impl VoyageBuilder {
         let config = self.config
             .ok_or_else(|| VoyageError::BuilderError("API key is required".to_string()))?;
         
+        let rate_limiter = Arc::new(RateLimiter::new());
         Ok(VoyageAiClient {
             config: VoyageAiClientConfig {
-                config,
-                embeddings_client: Arc::new(EmbeddingClient::new(config.clone(), Arc::new(RateLimiter::new()))),
-                rerank_client: Arc::new(DefaultRerankClient::new(config.clone(), Arc::new(RateLimiter::new()))),
+                config: config.clone(),
+                embeddings_client: Arc::new(EmbeddingClient::new(config.clone(), rate_limiter.clone())),
+                rerank_client: Arc::new(DefaultRerankClient::new(config.clone(), rate_limiter.clone())),
                 search_client: Arc::new(SearchClient::new(
-                    EmbeddingClient::new(config.clone(), Arc::new(RateLimiter::new())),
-                    DefaultRerankClient::new(config.clone(), Arc::new(RateLimiter::new()))
+                    EmbeddingClient::new(config.clone(), rate_limiter.clone()),
+                    DefaultRerankClient::new(config, rate_limiter)
                 )),
             }
         })
