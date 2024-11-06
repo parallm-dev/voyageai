@@ -27,10 +27,10 @@ use log::{debug, info};
 
 #[derive(Clone)]
 pub struct VoyageAiClientConfig {
-    config: VoyageConfig,
-    embeddings_client: Arc<EmbeddingClient>,
-    rerank_client: Arc<DefaultRerankClient>,
-    search_client: Arc<SearchClient>,
+    pub config: VoyageConfig,
+    pub embeddings_client: Arc<EmbeddingClient>,
+    pub rerank_client: Arc<DefaultRerankClient>,
+    pub search_client: Arc<SearchClient>,
 }
 
 use crate::traits::voyage::VoyageAiClientExt;

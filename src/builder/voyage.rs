@@ -19,9 +19,6 @@ use std::sync::Arc;
 #[derive(Clone)]
 pub struct VoyageBuilder {
     config: Option<VoyageConfig>,
-    embeddings: Option<EmbeddingsRequestBuilder>,
-    rerank: Option<RerankRequestBuilder>,
-    search: Option<SearchRequestBuilder>,
 }
 
 
