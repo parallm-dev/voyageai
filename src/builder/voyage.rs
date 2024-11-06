@@ -1,6 +1,9 @@
 use crate::{
     builder::embeddings::EmbeddingsRequestBuilder,
     client::{SearchRequest, VoyageAiClient},
+    RerankRequestBuilder,
+    SearchRequestBuilder,
+    VoyageError,
     config::VoyageConfig,
     errors::VoyageError,
     models::{
@@ -26,7 +29,12 @@ impl Default for VoyageBuilder {
             .ok()
             .map(VoyageConfig::new);
 
-        VoyageBuilder { config: api_key }
+        VoyageBuilder { 
+            config: api_key,
+            embeddings: None,
+            rerank: None,
+            search: None
+        }
     }
 }
 

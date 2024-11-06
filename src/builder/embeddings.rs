@@ -4,7 +4,7 @@ use crate::{
 };
 use log::{debug, error};
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct EmbeddingsRequestBuilder {
     input: Option<EmbeddingsInput>,
     model: Option<EmbeddingModel>,
